@@ -2,7 +2,6 @@ import { View, Text ,StyleSheet} from 'react-native'
 import React from 'react'
 import { defalutSize } from '@/constants/Size'
 import Colors from '@/constants/Colors'
-import { windowWidth } from '@/constants/Dimensions'
 
 const DivideLine = ({width,color}:any) => {
   return (

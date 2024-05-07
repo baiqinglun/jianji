@@ -1,1 +1,1 @@
-export const avaterImage = "@assets/images/avater.jpg"
+export const avaterImage = require("../../assets/images/avater.jpg")

@@ -8,16 +8,18 @@ import { ScrollView, View ,Text,StyleSheet,Image} from 'react-native';
 const CustomDrawer = () => {
     return (
       <View style={styles.container}>
+        {/* 顶部用户信息 */}
         <View style={styles.top}>
             <View style={styles.user}>
-                <Image style={styles.avater} source={require("../../../assets/images/avater.jpg")}/>
+                {/* <Image style={styles.avater} source={require("../../../assets/images/avater.jpg")}/> */}
+                <Image style={styles.avater} source={avaterImage}/>
                 <Text style={styles.username}>用户名</Text>
             </View>
             <View style={styles.setting}>
                 <Ionicons name='settings-outline' size={28} color={Colors.light.other}/>
             </View>
         </View>
-
+        {/* 统计信息 */}
         <View style={styles.statistics}>
             <View style={styles.count}>
                 <Text style={styles.countText}>4</Text>
@@ -33,7 +35,7 @@ const CustomDrawer = () => {
             </View>
         </View>
         <DivideLine color={Colors.light.other} width={250}/>
-
+        {/* 导航栏 */}
         <View style={styles.navigateContainer}>
             <View style={styles.navigate}>
                 <View style={styles.navigateLeft}>
@@ -59,7 +61,7 @@ const CustomDrawer = () => {
         </View>
 
         <DivideLine color={Colors.light.other} width={250}/>
-
+        {/* 标签栏 */}
         <Text style={styles.allTagText}>全部标签</Text>
         <View style={styles.tagContainer}>
             <View style={styles.tag}>
