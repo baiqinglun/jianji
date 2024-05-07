@@ -52,7 +52,7 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen name="(labels)" options={{ headerShown: false }} />
         <Stack.Screen name="create" options={{ headerShown: true }} />
-        <Stack.Screen name="search" options={{ headerShown: true }} />
+        <Stack.Screen name="search" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );
