@@ -1,28 +1,26 @@
-import {useEffect, useState,useMemo} from 'react';
-import {TextInput,  Pressable, View,Text,StyleSheet, FlatList, Modal, Alert, TouchableHighlight } from 'react-native';
+import { useRef, useState} from 'react';
+import {Pressable, View,StyleSheet, FlatList, Modal, Alert,  Keyboard } from 'react-native';
 import { Stack,Link } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '@/constants/Colors';
 import notions from '@assets/data/notions';
 import {FontSize,defalutSize} from '@/constants/Size';
 import CartItem from '@/components/CartItem';
-import { Button } from '@rneui/themed';
+import CreateNotionModal from '@/components/CreateNotionModal';
 
 function HomeScreen({ navigation }:any) {
-  const [textInput,setTextInput] = useState("")
+  const notionModalRef:any = useRef(null)
   const [isModalVisible, setModalVisible] = useState(false);
-  const [id,setId] = useState(null)
-
   // 切换模态框
   const toggleModal = () => {
-    setModalVisible(!isModalVisible);
+    setModalVisible(!isModalVisible)
   };
 
-  // 创建灵感
-  const create = () => {
-    setModalVisible(!isModalVisible);
-
-    setTextInput("")
+  // 添加灵感模态框
+  const openModal = () => {
+    console.log(notionModalRef);
+    notionModalRef?.current?.inputOnFocus()
+    toggleModal()
   };
 
   return (
@@ -58,63 +56,31 @@ function HomeScreen({ navigation }:any) {
 
       {/* 新增按钮 */}
       <View style={styles.button}>
-        {/* <Link href="/create" asChild> */}
-            <Pressable onPress={toggleModal } style={styles.buttonIcon}>
-              {({ pressed }) => (
-                <Ionicons
-                  color={"#fff"}
-                  name="add"
-                  size={40}
-                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                />
-              )}
-            </Pressable>
-          {/* </Link> */}
+        <Pressable onPress={()=>{openModal()} } style={styles.buttonIcon}>
+          {({ pressed }) => (
+            <Ionicons
+              color={"#fff"}
+              name="add"
+              size={40}
+              style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+            />
+          )}
+        </Pressable>
       </View>
       
-      {/* 模态框 */}
+      {/* 灵感记录弹窗 */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={isModalVisible}
         onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
-          setModalVisible(!isModalVisible);
+        Alert.alert("Modal has been closed.");
+        setModalVisible(!isModalVisible);
         }}
       >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <TextInput
-              multiline={true}
-              style={styles.input}
-              maxLength={1000}
-              editable
-              value={textInput}
-              onChangeText={text => setTextInput(text)}/>
-
-            <View style={styles.modalBtn}>
-              <Pressable onPress={toggleModal }>
-                {({ pressed }) => (
-                  <Text style={styles.cancel}>取消</Text>
-                )}
-              </Pressable>
-              <Pressable onPress={create }>
-                {({ pressed }) => (
-                  <Ionicons
-                    color={Colors.light.tint}
-                    name="send"
-                    size={30}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </View>
-          </View>
-        </View>
+        <CreateNotionModal props={{toggleModal,isModalVisible}} ref={notionModalRef}/>
       </Modal>
-
-    </View>
-      
+  </View>
   );
 }
 
@@ -136,36 +102,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom:15,
     right:0,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignSelf:'center',
-  },
-  modalView: {
-    backgroundColor: "#fff",
-    borderRadius: 5,
-    paddingLeft: 5,
-    height:350,
-    width:300,
-    elevation: 2
-  },
-  input:{
-    backgroundColor:"#fff",
-    height:300,
-    textAlignVertical: 'top',
-    padding:defalutSize,
-    fontSize:FontSize.m
-  },
-  modalBtn:{
-    flexDirection:'row',
-    justifyContent:'space-between'
-  },
-  cancel:{
-    color:Colors.light.tagText,
-    marginLeft:10,
-    marginTop:10,
-    fontSize:FontSize.m
   }
 })
 

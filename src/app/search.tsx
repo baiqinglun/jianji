@@ -1,21 +1,23 @@
 import { View, Text, StyleSheet, TextInput, Dimensions } from 'react-native'
 import React, { useState,useRef } from 'react'
-import { Stack } from 'expo-router'
+import { Stack, router } from 'expo-router'
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { FontSize, defalutSize } from '@/constants/Size';
 import Colors from '@/constants/Colors';
 import { ButtonGroup } from '@rneui/base';
+import { windowWidth } from '@/constants/Dimensions';
 
 export default function SearchScreen (){
   const insets = useSafeAreaInsets();
   const [searchText,setSearchText] = useState("")
   const [selectedIndexes, setSelectedIndexes] = useState([]);
 
-  const textInput = useRef(null);
+  const textInput:any = useRef(null);
 
   const inputLose = () => {
     textInput?.current?.blur();
+    router.back()
   }
 
   // 搜索
@@ -86,17 +88,19 @@ const styles = StyleSheet.create({
     flexDirection:"row",
     backgroundColor:"#f2f4f3",
     alignItems:'center',
-    width:Dimensions.get('window').width-80,
-    padding:defalutSize*0.7,
+    width:windowWidth-80,
+    paddingHorizontal:defalutSize,
+    paddingVertical:defalutSize*0.7,
     borderRadius:defalutSize*2
   },
   cancel:{
-    width:50,
+    marginLeft:'auto',
+    marginRight:defalutSize,
     fontSize:FontSize.m,
     color:Colors.light.other
   },
   input:{
-    width:Dimensions.get('window').width-100,
+    width:windowWidth-80,
     fontSize:FontSize.s,
     marginLeft:defalutSize*0.5,
     color:Colors.light.other
