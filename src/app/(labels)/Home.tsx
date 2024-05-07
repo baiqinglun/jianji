@@ -10,7 +10,8 @@ import { Button } from '@rneui/themed';
 
 function HomeScreen({ navigation }:any) {
   const [textInput,setTextInput] = useState("")
-  const [isModalVisible, setModalVisible] = useState(true);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [id,setId] = useState(null)
 
   // 切换模态框
   const toggleModal = () => {
@@ -70,7 +71,7 @@ function HomeScreen({ navigation }:any) {
             </Pressable>
           {/* </Link> */}
       </View>
-
+      
       {/* 模态框 */}
       <Modal
         animationType="slide"
