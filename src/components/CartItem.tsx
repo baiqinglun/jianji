@@ -5,10 +5,11 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '@/constants/Colors';
 import {FontSize,defalutSize} from '@/constants/Size';
 import { Box,Button, Icon, Modal, NativeBaseProvider, Popover, ScrollView } from 'native-base';
+import { Dialog } from '@rneui/themed';
 
 function CartItem( {notion} :any) {
     const [textWidth, setTextWidth] = useState(0);
-
+    const [deleteVisible, setDeleteVisible] = useState(false);
     const onTextLayout = (event:any) => {
       const { height } = event.nativeEvent.layout;
         setTextWidth(height)
@@ -28,7 +29,7 @@ function CartItem( {notion} :any) {
     }
     const deleteNotion = () => {
       console.log("删除");
-      
+      setDeleteVisible(!deleteVisible)
     }
   
     return (
@@ -71,6 +72,20 @@ function CartItem( {notion} :any) {
         <Text style={styles.content}>{notion.content}</Text>
         </Link>
 
+      {/* 是否删除 */}
+      <View style={{backgroundColor:Colors.light.background}}>
+        <Dialog
+          isVisible={deleteVisible}
+          // onBackdropPress={toggleDialog2}
+        >
+          <Dialog.Title titleStyle={{color:'red',fontWeight:'600'}} title={`是否删除`}/>
+          <Text>{notion.content}</Text>
+          <Dialog.Actions>
+            <Dialog.Button title="取消" onPress={() => {setDeleteVisible(!deleteVisible)}}/>
+            <Dialog.Button title="确认" onPress={() => {setDeleteVisible(!deleteVisible)}}/>
+          </Dialog.Actions>
+        </Dialog>
+      </View>
       </View>
     );
   }

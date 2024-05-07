@@ -73,8 +73,7 @@ function HomeScreen({ navigation }:any) {
         transparent={true}
         visible={isModalVisible}
         onRequestClose={() => {
-        Alert.alert("Modal has been closed.");
-        setModalVisible(!isModalVisible);
+          setModalVisible(!isModalVisible);
         }}
       >
         <CreateNotionModal props={{toggleModal,isModalVisible}} ref={notionModalRef}/>
