@@ -8,7 +8,7 @@ import { pasteFromClipboard } from '@/libs/Clipboard';
 
 export default forwardRef(({props}:any,ref:any) => {
     const [textInput,setTextInput] = useState<string | undefined>("")
-    const {notionModalRef} = ref
+    
     const inputRef:any = useRef(null)
     const {toggleModal,isModalVisible,id} = props
 
@@ -17,19 +17,17 @@ export default forwardRef(({props}:any,ref:any) => {
         setTextInput(notion?.content)
     },[])
 
-    useImperativeHandle(notionModalRef, () => ({
+    useImperativeHandle(ref, () => ({
         inputOnFocus
       }));
 
     // 切换模态框
-    const inputOnFocus = async () => {
-        console.log(1);
-        await toggleModal();
-        if(!isModalVisible){
-        notionModalRef?.current?.focus();
-        setTimeout(() => {
-            Keyboard.dismiss()
-        }, 10);
+    const inputOnFocus = () => {
+        if(isModalVisible){
+            inputRef?.current?.focus();
+            setTimeout(() => {
+                Keyboard.dismiss()
+            }, 10);
         }
     };
 

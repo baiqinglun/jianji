@@ -7,8 +7,6 @@ import notions from '@assets/data/notions';
 import {FontSize,defalutSize} from '@/constants/Size';
 import { useLocalSearchParams } from 'expo-router';
 import { Dialog } from '@rneui/themed';
-import * as Clipboard from 'expo-clipboard';
-import { pasteFromClipboard } from '@/libs/Clipboard';
 import CreateNotionModal from '@/components/CreateNotionModal';
 
 const IdScreen = () => {

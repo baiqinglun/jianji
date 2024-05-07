@@ -17,10 +17,9 @@ function HomeScreen({ navigation }:any) {
   };
 
   // 添加灵感模态框
-  const openModal = () => {
-    console.log(notionModalRef);
+  const openModal = async () => {
+    await toggleModal()
     notionModalRef?.current?.inputOnFocus()
-    toggleModal()
   };
 
   return (
