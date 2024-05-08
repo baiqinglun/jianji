@@ -86,8 +86,8 @@ export default function SearchScreen (){
       {/* 内容 */}
       <View style={styles.selectContainer}>
         <Text style={styles.selectTip}>搜索指定内容</Text>
-        <Checkbox.Item label="标签" status={selectTag} onPress={()=>{toggleSelectTag()}}/>
-        <Checkbox.Item label="内容" status={selectedContent} onPress={()=>{toggleSelectedContent()}}/>
+        <Checkbox.Item color={Colors.light.tint} label="标签" status={selectTag} onPress={()=>{toggleSelectTag()}}/>
+        <Checkbox.Item color={Colors.light.tint} label="内容" status={selectedContent} onPress={()=>{toggleSelectedContent()}}/>
       </View>
       </SafeAreaProvider>
   )

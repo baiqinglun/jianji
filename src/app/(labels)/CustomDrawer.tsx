@@ -11,8 +11,11 @@ import {tags} from '@assets/data/tags'
 import { noteList } from '@assetsdata/noteList';
 
 const CustomDrawer = () => {
-    const [expanded, setExpanded] = useState(true);
+    const [renameModal,setRenameModal] = useState<boolean>(false)
 
+    const tagRename = () => {
+        
+    }
     return (
       <View style={styles.container}>
         {/* 顶部用户信息 */}
@@ -73,6 +76,7 @@ const CustomDrawer = () => {
         <List.Section title="" style={{backgroundColor:"#fff"}}>
             {tags.map((item)=>(
                 <List.Accordion
+                    onLongPress={()=>{console.log(1);}}
                     descriptionStyle={{backgroundColor:'red'}}
                     rippleColor={Colors.light.tagBg}
                     titleStyle={{color:Colors.light.defalutText}}
