@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {  View ,Text,StyleSheet,Image} from 'react-native';
 import { Link } from 'expo-router';
 import {  List } from 'react-native-paper';
-import { Ionicons } from '@expo/vector-icons';
+import {  MaterialIcons } from '@expo/vector-icons';
 import DivideLine from '@/components/DivideLine';
 import Colors from '@/constants/Colors';
 import { avaterImage } from '@/constants/Images';
@@ -12,9 +12,7 @@ import { noteList } from '@assetsdata/noteList';
 
 const CustomDrawer = () => {
     const [renameModal,setRenameModal] = useState<boolean>(false)
-
     const tagRename = () => {
-        
     }
     return (
       <View style={styles.container}>
@@ -26,8 +24,8 @@ const CustomDrawer = () => {
                 <Text style={styles.username}>用户名</Text>
             </View>
             <View style={styles.setting}>
-                <Link href={"./Settings"}>
-                    <Ionicons name='settings-outline' size={28} color={Colors.light.other}/>
+                <Link href={"/(drawer)/(setting)"}>
+                    <MaterialIcons name='autorenew' size={28} color={Colors.light.other}/>
                 </Link>
             </View>
         </View>
@@ -35,7 +33,7 @@ const CustomDrawer = () => {
         {/* 统计信息 */}
         <View style={styles.statistics}>
             <View style={styles.count}>
-                <Text style={styles.countText}>4</Text>
+                <Text onPress={()=>{tagRename()}} style={styles.countText}>4</Text>
                 <Text style={styles.countText1}>简记</Text>
             </View>
             <View style={styles.count}>
@@ -53,7 +51,8 @@ const CustomDrawer = () => {
         {/* 导航栏 */}
         <List.Section title="" style={{backgroundColor:"#fff"}}>
             {noteList.map((item)=>(
-                <List.Item
+                <Link href={"/(drawer)/(home)/"} asChild>
+                    <List.Item
                     descriptionStyle={{backgroundColor:'red'}}
                     rippleColor={Colors.light.tagBg}
                     titleStyle={{color:Colors.light.defalutText}}
@@ -62,12 +61,13 @@ const CustomDrawer = () => {
                     left={props => <List.Icon {...props} icon="book-outline"/>}
                     right={props => (
                         <View style={{flexDirection:'row',justifyContent:'flex-end'}}>
-                            <Text>4</Text>
+                            <Text>{item.count}</Text>
                             <List.Icon {...props} icon="chevron-right"/>
                         </View>
                     )}
                 >
                 </List.Item>
+                </Link>
             ))}
         </List.Section>
 
@@ -76,6 +76,7 @@ const CustomDrawer = () => {
         <List.Section title="" style={{backgroundColor:"#fff"}}>
             {tags.map((item)=>(
                 <List.Accordion
+                onPress={()=>{tagRename()}}
                     onLongPress={()=>{console.log(1);}}
                     descriptionStyle={{backgroundColor:'red'}}
                     rippleColor={Colors.light.tagBg}
@@ -92,8 +93,8 @@ const CustomDrawer = () => {
 
         <DivideLine color={Colors.light.other} width={250}/>
         {/* 回收站 */}
-        <Link href={"./Rubbish"}>
-            <List.Section title="" style={{backgroundColor:"#fff"}}>
+        <List.Section title="" style={{backgroundColor:"#fff"}}>
+            <Link href={"/(drawer)/(rubbish)/"}>
                 <List.Item
                     descriptionStyle={{backgroundColor:'red'}}
                     rippleColor={Colors.light.tagBg}
@@ -103,9 +104,19 @@ const CustomDrawer = () => {
                     left={props => <List.Icon {...props} icon="trash-can-outline"/>}
                 >
                 </List.Item>
-            </List.Section>
-        </Link>
-
+            </Link>
+            <Link href={"/(drawer)/(setting)/"}>
+                <List.Item
+                    descriptionStyle={{backgroundColor:'red'}}
+                    rippleColor={Colors.light.tagBg}
+                    titleStyle={{color:Colors.light.defalutText}}
+                    style={{backgroundColor:"#fff"}}
+                    title={"设置"}
+                    left={props => <List.Icon {...props} icon="cog-outline"/>}
+                >
+                </List.Item>
+            </Link>
+        </List.Section>
       </View>
     );
   };

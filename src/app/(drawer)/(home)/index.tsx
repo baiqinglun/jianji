@@ -7,9 +7,12 @@ import notions from '@assets/data/notions';
 import {FontSize,defalutSize} from '@/constants/Size';
 import CartItem from '@/components/CartItem';
 import CreateNotionModal from '@/components/CreateNotionModal';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { DrawerActions,useNavigation } from '@react-navigation/native';
 
-function HomeScreen({ navigation }:any) {
+function HomeScreen() {
   const notionModalRef:any = useRef(null)
+  const navigation = useNavigation();
   const [isModalVisible, setModalVisible] = useState(false);
   // 切换模态框
   const toggleModal = () => {
@@ -22,6 +25,8 @@ function HomeScreen({ navigation }:any) {
     notionModalRef?.current?.inputOnFocus()
   };
 
+
+
   return (
     <View style={styles.container}>
       {/* 头 */}
@@ -29,6 +34,18 @@ function HomeScreen({ navigation }:any) {
         options={{
           title:'简记',
           headerTitleAlign:'center',
+          headerLeft:()=>(
+            <Pressable onPress={()=>{navigation.dispatch(DrawerActions.toggleDrawer())}}>
+                {({ pressed }) => (
+                  <MaterialIcons
+                    color={Colors.light.other}
+                    name="density-medium"
+                    size={25}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+          ),
           headerRight: () => (
             <Link href="/search" asChild>
               <Pressable>
@@ -45,8 +62,7 @@ function HomeScreen({ navigation }:any) {
           ),
           headerTintColor:Colors.light.other
         }}
-        />
-      
+      ></Stack.Screen>
       {/* 卡片展示 */}
       <FlatList
         data={notions}

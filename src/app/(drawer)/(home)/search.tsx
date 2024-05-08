@@ -1,13 +1,15 @@
-import { View, Text, StyleSheet, TextInput } from 'react-native'
+import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native'
 import React, { useState,useRef } from 'react'
-import { Stack, router } from 'expo-router'
+import { Link, Stack, router } from 'expo-router'
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { FontSize, defalutSize } from '@/constants/Size';
 import Colors from '@/constants/Colors';
-import { ButtonGroup } from '@rneui/base';
 import { windowWidth } from '@/constants/Dimensions';
 import { Checkbox } from 'react-native-paper';
+import { DrawerActions,useNavigation } from '@react-navigation/native';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+
 
 export default function SearchScreen (){
   const insets = useSafeAreaInsets();
@@ -15,6 +17,7 @@ export default function SearchScreen (){
   const [selectedIndexes, setSelectedIndexes] = useState([]);
   const [selectTag, setSelectTag] = useState<'checked' | 'unchecked'>('unchecked');
   const [selectedContent, setSelectedContent] = useState<'checked' | 'unchecked'>("checked");
+  const navigation = useNavigation();
 
   const getStatus = (status:string) => {
     switch (status) {
@@ -44,11 +47,6 @@ export default function SearchScreen (){
 
   const textInput:any = useRef(null);
 
-  const inputLose = () => {
-    textInput?.current?.blur();
-    router.back()
-  }
-
   // 搜索
   const search = () => {
     console.log(searchText);
@@ -58,10 +56,21 @@ export default function SearchScreen (){
   return (
       <SafeAreaProvider style={[styles.container,{ paddingTop: insets.top}]}>
         <Stack.Screen
-        options={{headerTitleStyle:false}}/>
+        options={{headerShown:false}}
+      ></Stack.Screen>
 
       {/* 搜索 */}
       <View style={styles.top}>
+      <Pressable onPress={()=>{navigation.goBack()}}>
+                {({ pressed }) => (
+                  <MaterialIcons
+                    color={Colors.light.other}
+                    name="chevron-left"
+                    size={30}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
         <View style={styles.inputContainer}>
           <Ionicons
               color={Colors.light.other}
@@ -80,7 +89,9 @@ export default function SearchScreen (){
             onChangeText={text => setSearchText(text)}
           />
         </View>
-        <Text onPress={inputLose} style={styles.cancel}>取消</Text>
+        <Pressable onPress={search}>
+          <Text style={styles.search}>搜索</Text>
+        </Pressable>
       </View>
 
       {/* 内容 */}
@@ -95,25 +106,27 @@ export default function SearchScreen (){
 
 const styles = StyleSheet.create({
   container:{
+    flex:1,
     backgroundColor:'#fff'
   },
   top:{
-    flexDirection:"row",
+    marginTop:0,
     justifyContent:'space-between',
     margin:defalutSize,
+    flexDirection:"row",
     alignItems:'center'
   },
   inputContainer:{
     flexDirection:"row",
     backgroundColor:"#f2f4f3",
     alignItems:'center',
-    width:windowWidth-80,
+    width:windowWidth-120,
     paddingHorizontal:defalutSize,
     paddingVertical:defalutSize*0.7,
     borderRadius:defalutSize*2
   },
-  cancel:{
-    marginLeft:'auto',
+  search:{
+    marginLeft:10,
     marginRight:defalutSize,
     fontSize:FontSize.m,
     color:Colors.light.other
