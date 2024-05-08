@@ -3,34 +3,30 @@ import {TextInput,  Pressable, View,Text,StyleSheet, FlatList, Alert, Button, Lo
 import { Stack,Link, router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '@/constants/Colors';
-import notions from '@assets/data/notions';
 import {FontSize,defalutSize} from '@/constants/Size';
 import { useLocalSearchParams } from 'expo-router';
 import { Dialog } from '@rneui/themed';
 import CreateNotionModal from '@/components/CreateNotionModal';
+import { exeSelectById } from '@/libs/Sqlite';
 
 const IdScreen = () => {
     const {id} = useLocalSearchParams();
-    const [textInput,setTextInput] = useState<string|undefined>("")
     const [isModalVisible, setModalVisible] = useState(false);
     const notionModalRef:any = useRef(null)
+    
+    const getDataById = async () => {
+      exeSelectById(id,notionModalRef?.current?.setTextInput)
+    }
 
     useEffect(()=>{
-        const notion = notions.find((item)=>item.id.toString() === id);
-        setTextInput(notion?.content)
-    },[])
+      getDataById()
+    },[id])
     
     // 取消
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
         router.back()
       };
-
-    // 创建灵感
-    const create = () => {
-        setModalVisible(!isModalVisible);
-        setTextInput("")
-    };
 
   return (
     <View style={styles.container}>
@@ -40,7 +36,8 @@ const IdScreen = () => {
                 headerTitleAlign:'center',
                 headerTintColor:Colors.light.other}}/>
         <CreateNotionModal props={{toggleModal,isModalVisible,id}} ref={notionModalRef}/>
-
+        <View>
+        </View>
         <Dialog
         isVisible={isModalVisible}
         onBackdropPress={toggleModal}

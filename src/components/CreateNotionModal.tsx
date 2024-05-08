@@ -5,20 +5,21 @@ import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import notions from '@assetsdata/notions';
 import { pasteFromClipboard } from '@/libs/Clipboard';
+import { loadDatabase } from '@/libs/Sqlite';
+import * as Crypto from 'expo-crypto';
+import dayjs from 'dayjs';
+import { exeInsert } from '@/libs/Sqlite';
 
 export default forwardRef(({props}:any,ref:any) => {
     const [textInput,setTextInput] = useState<string | undefined>("")
     
+    // 获取父组件传递的值与方法
     const inputRef:any = useRef(null)
-    const {toggleModal,isModalVisible,id} = props
-
-    useEffect(()=>{
-        const notion = notions.find((item)=>item.id.toString() === id);
-        setTextInput(notion?.content)
-    },[])
-
+    const {toggleModal,isModalVisible,getData,id} = props
+    
     useImperativeHandle(ref, () => ({
-        inputOnFocus
+        inputOnFocus,
+        setTextInput
       }));
 
     // 切换模态框
@@ -31,9 +32,49 @@ export default forwardRef(({props}:any,ref:any) => {
         }
     };
 
+    const send = async () => {
+      if(id){
+        console.log("update");
+        await updata()
+      }else{
+        console.log("create");
+        await create()
+        console.log("create2");
+      }
+    }
+
+    // 更新数据
+    const updata = async () => {
+      await toggleModal();
+      console.log(textInput);
+      // await db.transaction(
+      //   (tx:any) => {
+      //     tx.executeSql('UPDATE notions SET content = ? WHERE id = ?', [textInput, id], (_:any, resultSet:any) => {
+      //       // 更改成功时的操作
+      //       console.log("更改成功");
+      //       getData()
+      //     },
+      //     (_:any, error:any):any => {
+      //       // 更改失败时的操作
+      //       console.log("更改失败");
+
+      //     });
+      //   },
+      //   (error:any) => console.log("Transaction Error: ", error),
+      //   () => console.log("Transaction Success!")
+      // );
+      // db.closeAsync()
+
+    }
+
     // 创建灵感
-    const create = () => {
+    const create = async () => {
         toggleModal();
+        const UUID = Crypto.randomUUID();
+        const day = dayjs().valueOf()
+        console.log(UUID);
+        await exeInsert([UUID,textInput,"阅读/曹操传", day],getData)
+        console.log(day);
         setTextInput("")
       };
     
@@ -68,7 +109,7 @@ export default forwardRef(({props}:any,ref:any) => {
                     />
                     )}
                 </Pressable>
-                <Pressable onPress={create }>
+                <Pressable onPress={send}>
                     {({ pressed }) => (
                     <Ionicons
                         color={Colors.light.tint}

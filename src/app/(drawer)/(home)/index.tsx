@@ -9,14 +9,14 @@ import CartItem from '@/components/CartItem';
 import CreateNotionModal from '@/components/CreateNotionModal';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { DrawerActions,useNavigation } from '@react-navigation/native';
-import { searchData, loadDatabase } from '@/libs/Sqlite';
-import * as Crypto from 'expo-crypto';
-import dayjs from 'dayjs';
+import { exeSelectAll } from '@/libs/Sqlite';
+
 function HomeScreen() {
   const notionModalRef:any = useRef(null)
   const navigation = useNavigation();
   const [mynotions,setNotions] = useState([])
   const [isModalVisible, setModalVisible] = useState(false);
+  
   // 切换模态框
   const toggleModal = () => {
     setModalVisible(!isModalVisible)
@@ -28,21 +28,9 @@ function HomeScreen() {
     notionModalRef?.current?.inputOnFocus()
   };
 
+  // 获取数据并添加至列表
   const getData = async() =>{
-    const db = await loadDatabase()
-    const readOnly = true;
-    const UUID = Crypto.randomUUID();
-    const day = dayjs().valueOf()
-    console.log(UUID);
-    console.log(day.valueOf()) ;
-    await db.transactionAsync(async (tx:any) => {
-      // const result = await tx.executeSqlAsync(`INSERT INTO NOTIONS (id,content,tags,time) VALUES(?,?,?,?)`,[`${UUID}`, "学可以无术，但不可以不博。", "阅读/曹操传",`${day}`],readOnly);
-      // await tx.executeSqlAsync(`INSERT INTO NOTIONS (id,content,tags,time) VALUES (${UUID},"学可以无术，但不可以不博。","阅读/曹操传", ${day})`,readOnly);
-      // const result = await tx.executeSqlAsync('SELECT * FROM NOTIONS', []);
-      // console.log('Count:', result.rows[0]['COUNT(*)']);
-      // console.log(result);
-      // setNotions(result.rows)
-    }, readOnly);
+    exeSelectAll(setNotions)
   }
 
   useEffect(() =>{
@@ -85,6 +73,7 @@ function HomeScreen() {
           headerTintColor:Colors.light.other
         }}
       ></Stack.Screen>
+
       {/* 卡片展示 */}
       <FlatList
         data={mynotions}
@@ -111,10 +100,11 @@ function HomeScreen() {
         transparent={true}
         visible={isModalVisible}
         onRequestClose={() => {
-          setModalVisible(!isModalVisible);
+          setModalVisible(!isModalVisible)
         }}
       >
-        <CreateNotionModal props={{toggleModal,isModalVisible}} ref={notionModalRef}/>
+        {/* 传递给子组件一些数值及函数 */}
+        <CreateNotionModal props={{toggleModal,isModalVisible,getData}} ref={notionModalRef}/>
       </Modal>
   </View>
   );
