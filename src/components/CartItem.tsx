@@ -1,34 +1,46 @@
 import {useState} from 'react';
-import {  Pressable, View,Text,StyleSheet } from 'react-native';
-import { Stack,Link } from 'expo-router';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { View,StyleSheet } from 'react-native';
+import { Button,Text, Card, Avatar } from 'react-native-paper';
+import { Link } from 'expo-router';
+import MyDialog from './Dialog';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Colors from '@/constants/Colors';
 import {FontSize,defalutSize} from '@/constants/Size';
-import { Box,Button, Icon, Modal, NativeBaseProvider, Popover, ScrollView } from 'native-base';
-import { Dialog } from '@rneui/themed';
+import { Tooltip } from '@rneui/themed';
 
 function CartItem( {notion} :any) {
     const [textWidth, setTextWidth] = useState(0);
     const [deleteVisible, setDeleteVisible] = useState(false);
+    const [openList, setOpenList] = useState(false);
     const onTextLayout = (event:any) => {
       const { height } = event.nativeEvent.layout;
         setTextWidth(height)
     };
 
+    const hideDialog = () => setDeleteVisible(false);
+
+    const toggleDialog = () => {
+      setDeleteVisible(!deleteVisible);
+    }
+
     const shareNotion = () => {
+      setOpenList(!openList)
       console.log("分享");
       
     }
     const copyNotionContent = () => {
+      setOpenList(!openList)
       console.log("复制");
       
     }
     const editNotion = () => {
+      setOpenList(!openList)
       console.log("编辑");
       
     }
     const deleteNotion = () => {
       console.log("删除");
+      setOpenList(!openList)
       setDeleteVisible(!deleteVisible)
     }
   
@@ -36,61 +48,57 @@ function CartItem( {notion} :any) {
       <View style={styles.container}>
         <View style={styles.time}>
           <Text style={styles.timeText}>{notion.time}</Text>
-          <NativeBaseProvider>
-            <View style={{width:50,height:20}}>
-              <Popover trigger={triggerProps => {
-              return (
-                <Button
-                  style={{width:30,padding:30}}
-                  {...triggerProps} 
-                  variant="unstyled"
-                  leftIcon={
-                    <Icon
-                      as={Ionicons}
-                      name="ellipsis-horizontal"
-                      size="sm" />}>
-                </Button>
-              )
-            }}>
-              <Popover.Content accessibilityLabel="Delete Customerd" w="100">
-                <Popover.Arrow />
-                  <Popover.Body>
-                  <Button variant="unstyled" onPress={() => shareNotion()}>分享</Button>
-                  <Button variant="unstyled" onPress={() => copyNotionContent()}>复制</Button>
-                  <Button variant="unstyled" onPress={() => editNotion()}>编辑</Button>
-                  <Button variant="ghost" onPress={() => deleteNotion()}>删除</Button>
-                  </Popover.Body>
-                </Popover.Content>
-              </Popover>
-            </View>
-          </NativeBaseProvider>
+          {/* 弹窗 */}
+          <Tooltip
+            visible={openList}
+            onOpen={() => setOpenList(true)}
+            onClose={() => setOpenList(false)}
+            width={100}
+            height={200}
+            backgroundColor={Colors.light.background}
+            popover={
+              <View style={{flex:1,justifyContent:'space-between',paddingVertical:10}}>
+                <Button style={{width:'100%'}} textColor={Colors.light.defalutText} onPress={() => copyNotionContent()}>复制</Button>
+                <Button style={{width:'100%'}} textColor={Colors.light.defalutText} onPress={() => shareNotion()}>分享</Button>
+                <Button style={{width:'100%'}} textColor={Colors.light.defalutText} onPress={() => editNotion()}>编辑</Button>
+                <Button style={{width:'100%'}} textColor='red' onPress={() => deleteNotion()}>删除</Button>
+              </View>
+            }
+          >
+            <MaterialIcons
+              name="more-horiz"
+              color={Colors.light.other}
+              size={20} />
+          </Tooltip>
         </View>
-        <View style={[styles.tag,{width:textWidth*6}]}>
-          <Text style={{color:Colors.light.tagText}} onLayout={onTextLayout}>#{notion.tags}</Text>
+        
+        {/* 标签 */}
+        <View style={[styles.tag]}>
+          <MaterialIcons style={{}} name='sell' color={Colors.light.tagText} size={15}/>
+          <Text style={styles.tagText} onLayout={onTextLayout}>{notion.tags}</Text>
         </View>
+        
+        {/* 内容 */}
         <Link href={`/${notion.id}`} asChild>
         <Text style={styles.content}>{notion.content}</Text>
         </Link>
 
-      {/* 是否删除 */}
-      <View style={{backgroundColor:Colors.light.background}}>
-        <Dialog
-          isVisible={deleteVisible}
-          // onBackdropPress={toggleDialog2}
-        >
-          <Dialog.Title titleStyle={{color:'red',fontWeight:'600'}} title={`是否删除`}/>
-          <Text>{notion.content}</Text>
-          <Dialog.Actions>
-            <Dialog.Button title="取消" onPress={() => {setDeleteVisible(!deleteVisible)}}/>
-            <Dialog.Button title="确认" onPress={() => {setDeleteVisible(!deleteVisible)}}/>
-          </Dialog.Actions>
-        </Dialog>
-      </View>
+      {/* 是否删除弹窗 */}
+      <MyDialog 
+        content = {notion.content}
+        visible = {deleteVisible}
+        onConfirmClick = {toggleDialog}
+        onCancelClick = {toggleDialog}
+        onDismiss = {hideDialog}/>
+
       </View>
     );
   }
 
 const styles = StyleSheet.create({
+  title: {
+    textAlign: 'center',
+  },
 container:{
     backgroundColor:"#fff",
     width:'100%',
@@ -109,10 +117,18 @@ timeText:{
     width:310
 },
 tag:{
+    flexDirection:'row',
+    alignItems:'center',
+    width:'auto',
+    gap:5,
     padding:5,
-    backgroundColor:Colors.light.tagBg,
     color:Colors.light.tagText,
     marginBottom:defalutSize
+},
+tagText:{
+  backgroundColor:Colors.light.tagBg,
+  color:Colors.light.tagText,
+  padding:2
 },
 content:{
     color:Colors.light.defalutText,

@@ -64,6 +64,8 @@ export default function TabLayout() {
         }
         }}>
       <Drawer.Screen name="Home"/>
+      <Drawer.Screen name="Settings"/>
+      <Drawer.Screen name="Rubbish"/>
     </Drawer>
   );
 }

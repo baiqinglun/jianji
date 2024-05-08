@@ -4,7 +4,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-
+import { PaperProvider } from 'react-native-paper';
 import { useColorScheme } from '@/components/useColorScheme';
 import {TextInput,  Pressable, View,Text,StyleSheet, FlatList, Alert, Button, LogBox } from 'react-native';
 
@@ -51,6 +51,7 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
+    <PaperProvider>
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(labels)" options={{ headerShown: false }} />
@@ -58,5 +59,6 @@ function RootLayoutNav() {
         <Stack.Screen name="search" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
+    </PaperProvider>
   );
 }
