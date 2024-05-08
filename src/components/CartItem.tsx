@@ -1,7 +1,7 @@
 import {useState} from 'react';
-import { View,StyleSheet } from 'react-native';
+import { View,StyleSheet, Pressable } from 'react-native';
 import { Button,Text, Card, Avatar, Checkbox } from 'react-native-paper';
-import { Link } from 'expo-router';
+import { Link, useNavigation } from 'expo-router';
 import MyDialog from './Dialog';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Colors from '@/constants/Colors';
@@ -13,11 +13,12 @@ import dayjs from 'dayjs';
 
 dayjs.extend(relativeTime);
 
-function CartItem( {notion,cartType} :any) {
+function CartItem( {notion,cartType,func} :any) {
     const [deleteVisible, setDeleteVisible] = useState(false);
     const [openList, setOpenList] = useState(false);
     const [checked, setChecked] = useState(false);
-
+    const navigation = useNavigation();
+  
     const hideDialog = () => setDeleteVisible(false);
 
     const toggleDialog = () => {
@@ -84,12 +85,16 @@ function CartItem( {notion,cartType} :any) {
         {/* 标签 */}
         <View style={[styles.tag]}>
           <MaterialIcons style={{}} name='sell' color={Colors.light.tagText} size={15}/>
-          <Text style={styles.tagText} >{notion.tags}</Text>
+          <Text style={styles.tagText}>{notion.tags}</Text>
         </View>
         
         {/* 内容 */}
-        <Link href={`/${notion.id}`} asChild>
-        <Text numberOfLines={2} style={styles.content}>{notion.content}</Text>
+        <Link 
+        href={{
+          pathname:`/${notion.id}`,
+          params:{ func:func}
+        }}>
+            <Text numberOfLines={2} style={styles.content}>{notion.content}</Text>
         </Link>
 
       {/* 是否删除弹窗 */}

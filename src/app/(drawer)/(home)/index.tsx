@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState} from 'react';
+import { useCallback, useEffect, useRef, useState} from 'react';
 import {Pressable, View,StyleSheet, FlatList, Modal, Alert,  Keyboard } from 'react-native';
-import { Stack,Link } from 'expo-router';
+import { Stack,Link,Navigator, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '@/constants/Colors';
 import notions from '@assets/data/notions';
@@ -9,14 +9,31 @@ import CartItem from '@/components/CartItem';
 import CreateNotionModal from '@/components/CreateNotionModal';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { DrawerActions,useNavigation } from '@react-navigation/native';
-import { exeSelectAll } from '@/libs/Sqlite';
+import { useSqlite } from '@/providers/SqliteProvider';
 
 function HomeScreen() {
   const notionModalRef:any = useRef(null)
-  const navigation = useNavigation();
   const [mynotions,setNotions] = useState([])
   const [isModalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation()
   
+  const {exeSelectAll} = useSqlite()
+
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener('focus', async() => {
+  //     await getData()
+  //     console.log(1);
+  //   });
+  //   return unsubscribe;
+  // }, [navigation]);
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     getData()
+  //     return () => null
+  //   }, [])
+  // );
+
   // 切换模态框
   const toggleModal = () => {
     setModalVisible(!isModalVisible)
@@ -30,7 +47,7 @@ function HomeScreen() {
 
   // 获取数据并添加至列表
   const getData = async() =>{
-    exeSelectAll(setNotions)
+    // await exeSelectAll(setNotions)
   }
 
   useEffect(() =>{
@@ -77,7 +94,7 @@ function HomeScreen() {
       {/* 卡片展示 */}
       <FlatList
         data={mynotions}
-        renderItem={({item})=><CartItem cartType="show" notion={item}/>}
+        renderItem={({item})=><CartItem cartType="show" notion={item} func={getData}/>}
         contentContainerStyle={{gap:defalutSize,padding:defalutSize*0.5}}/>
 
       {/* 新增按钮 */}

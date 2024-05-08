@@ -2,12 +2,10 @@ import Drawer from 'expo-router/drawer'
 import CustomDrawer from './custom-drawer'
 import Colors from '@/constants/Colors'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import { Link, Stack } from 'expo-router'
-import { Pressable } from 'react-native'
 
 const Layout = () => {
     return (
+      
     <GestureHandlerRootView style={{ flex: 1 }}>
         <Drawer initialRouteName="Home"
         drawerContent={()=><CustomDrawer/>}

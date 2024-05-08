@@ -10,7 +10,7 @@ import CreateNotionModal from '@/components/CreateNotionModal';
 import { exeSelectById } from '@/libs/Sqlite';
 
 const IdScreen = () => {
-    const {id} = useLocalSearchParams();
+    const {id}:any = useLocalSearchParams();
     const [isModalVisible, setModalVisible] = useState(false);
     const notionModalRef:any = useRef(null)
     

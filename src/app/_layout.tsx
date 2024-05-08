@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { PaperProvider } from 'react-native-paper';
 import { useColorScheme } from '@/components/useColorScheme';
 import { LogBox } from 'react-native';
+import SqliteProvider, { useSqlite } from '@/providers/SqliteProvider';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -50,13 +51,24 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const {getDb,db} = useSqlite()
+
+  const get  = async() => {
+    await getDb()
+  }
+  useEffect(() => {
+    get();
+    console.log(db);
+  }, []);
   
   return (
     <PaperProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-        </Stack>
+        <SqliteProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+          </Stack>
+        </SqliteProvider>
       </ThemeProvider>
     </PaperProvider>
   );

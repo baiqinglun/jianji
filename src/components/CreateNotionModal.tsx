@@ -5,7 +5,7 @@ import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import notions from '@assetsdata/notions';
 import { pasteFromClipboard } from '@/libs/Clipboard';
-import { loadDatabase } from '@/libs/Sqlite';
+import { exeUpdate, loadDatabase } from '@/libs/Sqlite';
 import * as Crypto from 'expo-crypto';
 import dayjs from 'dayjs';
 import { exeInsert } from '@/libs/Sqlite';
@@ -16,10 +16,10 @@ export default forwardRef(({props}:any,ref:any) => {
     // 获取父组件传递的值与方法
     const inputRef:any = useRef(null)
     const {toggleModal,isModalVisible,getData,id} = props
-    
+
     useImperativeHandle(ref, () => ({
         inputOnFocus,
-        setTextInput
+        setTextInput,
       }));
 
     // 切换模态框
@@ -47,24 +47,7 @@ export default forwardRef(({props}:any,ref:any) => {
     const updata = async () => {
       await toggleModal();
       console.log(textInput);
-      // await db.transaction(
-      //   (tx:any) => {
-      //     tx.executeSql('UPDATE notions SET content = ? WHERE id = ?', [textInput, id], (_:any, resultSet:any) => {
-      //       // 更改成功时的操作
-      //       console.log("更改成功");
-      //       getData()
-      //     },
-      //     (_:any, error:any):any => {
-      //       // 更改失败时的操作
-      //       console.log("更改失败");
-
-      //     });
-      //   },
-      //   (error:any) => console.log("Transaction Error: ", error),
-      //   () => console.log("Transaction Success!")
-      // );
-      // db.closeAsync()
-
+      exeUpdate([textInput,id],getData)
     }
 
     // 创建灵感
