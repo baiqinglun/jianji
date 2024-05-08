@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, Dimensions } from 'react-native'
+import { View, Text, StyleSheet, TextInput } from 'react-native'
 import React, { useState,useRef } from 'react'
 import { Stack, router } from 'expo-router'
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,11 +7,40 @@ import { FontSize, defalutSize } from '@/constants/Size';
 import Colors from '@/constants/Colors';
 import { ButtonGroup } from '@rneui/base';
 import { windowWidth } from '@/constants/Dimensions';
+import { Checkbox } from 'react-native-paper';
 
 export default function SearchScreen (){
   const insets = useSafeAreaInsets();
   const [searchText,setSearchText] = useState("")
   const [selectedIndexes, setSelectedIndexes] = useState([]);
+  const [selectTag, setSelectTag] = useState<'checked' | 'unchecked'>('unchecked');
+  const [selectedContent, setSelectedContent] = useState<'checked' | 'unchecked'>("checked");
+
+  const getStatus = (status:string) => {
+    switch (status) {
+      case 'checked':
+        return true
+      case 'unchecked':
+        return true
+      default:
+        break;
+    }
+  }
+
+  const toggleSelectTag = () => {
+    if(selectTag == 'unchecked'){
+      setSelectTag("checked")
+    }else{
+      setSelectTag("unchecked")
+    }
+  }
+  const toggleSelectedContent = () => {
+    if(selectedContent == 'unchecked'){
+      setSelectedContent("checked")
+    }else{
+      setSelectedContent("unchecked")
+    }
+  }
 
   const textInput:any = useRef(null);
 
@@ -57,18 +86,8 @@ export default function SearchScreen (){
       {/* 内容 */}
       <View style={styles.selectContainer}>
         <Text style={styles.selectTip}>搜索指定内容</Text>
-        <ButtonGroup
-          // selectedButtonStyle={{borderColor:Colors.light.tagBg,borderWidth:1,backgroundColor:'#fff'}}
-          selectedButtonStyle={{backgroundColor:Colors.light.tagBg}}
-          selectedTextStyle={{color:Colors.light.tagText,fontWeight:'900'}}
-          buttons={['标签']}
-          selectMultiple
-          selectedIndexes={selectedIndexes}
-          onPress={(value) => {
-            setSelectedIndexes(value);
-          }}
-          containerStyle={{ marginBottom: 20 }}
-        />
+        <Checkbox.Item label="标签" status={selectTag} onPress={()=>{toggleSelectTag()}}/>
+        <Checkbox.Item label="内容" status={selectedContent} onPress={()=>{toggleSelectedContent()}}/>
       </View>
       </SafeAreaProvider>
   )
@@ -112,7 +131,7 @@ const styles = StyleSheet.create({
   selectTip:{
     marginVertical:defalutSize,
     color:Colors.light.other,
-    fontSize:FontSize.l,
+    fontSize:FontSize.m,
     marginLeft:defalutSize,
     marginBottom:defalutSize*2
   }
