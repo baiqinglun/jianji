@@ -19,6 +19,16 @@ function HomeScreen() {
   
   const {exeSelectAll} = useSqlite()
 
+  const {getDb,db} = useSqlite()
+
+  const get  = async() => {
+    await getDb()
+  }
+  useEffect(() => {
+    exeSelectAll(setNotions)
+    get();
+  }, []);
+
   // useEffect(() => {
   //   const unsubscribe = navigation.addListener('focus', async() => {
   //     await getData()

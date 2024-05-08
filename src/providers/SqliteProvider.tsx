@@ -3,15 +3,23 @@ import { PropsWithChildren, createContext, useContext, useState } from "react";
 import * as FileSystem from 'expo-file-system';
 import * as SQLite from 'expo-sqlite';
 
-const SqliteContext = createContext({
-    db:false,
+type SqliteType = {
+    db:SQLite.SQLiteDatabase | null | undefined | any;
+    getDb:() => void;
+    exeSelectAll:(func:any) => void;
+  }
+
+
+const SqliteContext = createContext<SqliteType>({
+    db:Object.create(null),
     getDb:()=>{},
-    exeSelectAll:(func:any)=>{}
+    exeSelectAll:()=>{}
 })
 
 const SqliteProvider = ({children}:PropsWithChildren) => {
-    const [db,setDb] = useState(false)
-    
+    // const [db,setDb] = useState<SQLite.SQLiteDatabase | null>()
+    let db:any= null;
+
     const getDb = async () => {
         try {
             const dbName = "mydata.db"
@@ -26,9 +34,9 @@ const SqliteProvider = ({children}:PropsWithChildren) => {
             );
             }
             await FileSystem.downloadAsync(dbUri,dbFilePath);
+            console.log("开启数据库1");
+            db = SQLite.openDatabase(dbName)
             console.log("开启数据库2");
-            // setDb(await SQLite.openDatabase(dbName))
-            await setDb(true)
         } catch (error) {
             console.error("初始化数据库时出错：", error);
         }
@@ -37,19 +45,19 @@ const SqliteProvider = ({children}:PropsWithChildren) => {
 
     const exeSelectAll = async (func:any) => {
         try {
-          const readOnly = true;
-          if(!db) return;
-          db.transaction(async (tx:any) => {
-            const result = tx.executeSql('SELECT * FROM NOTIONS', []);
-            console.log("查询全部成功");
-            const data = result.rows
-            data.reverse()
-            func(data)
-            // await db.closeAsync();
-          }, readOnly);
-        } catch (error) {
-          console.error('查询全部An error occurred:', error);
-        }
+            getDb()
+            const readOnly = true;
+            await db.transactionAsync(async (tx:any) => {
+              const result = await tx.executeSqlAsync('SELECT * FROM NOTIONS', []);
+              console.log("查询全部成功");
+              const data = result.rows
+              data.reverse()
+              func(data)
+              // await db.closeAsync();
+            }, readOnly);
+          } catch (error) {
+            console.error('查询全部An error occurred:', error);
+          }
       }
 
     return (

@@ -51,25 +51,16 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const {getDb,db} = useSqlite()
 
-  const get  = async() => {
-    await getDb()
-  }
-  useEffect(() => {
-    get();
-    console.log(db);
-  }, []);
-  
   return (
-    <PaperProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <SqliteProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-          </Stack>
-        </SqliteProvider>
-      </ThemeProvider>
-    </PaperProvider>
+    <SqliteProvider>
+      <PaperProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+            </Stack>
+        </ThemeProvider>
+      </PaperProvider>
+    </SqliteProvider>
   );
 }
