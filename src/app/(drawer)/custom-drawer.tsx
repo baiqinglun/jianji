@@ -49,7 +49,7 @@ const CustomDrawer = () => {
         {/* 导航栏 */}
         <List.Section title="" style={{backgroundColor:"#fff"}}>
             {noteList.map((item)=>(
-                <Link href={"/(drawer)/(home)/"} asChild>
+                <Link key={item.id} href={"/(drawer)/(home)/"} asChild>
                     <List.Item
                     descriptionStyle={{backgroundColor:'red'}}
                     rippleColor={Colors.light.tagBg}
@@ -74,7 +74,8 @@ const CustomDrawer = () => {
         <List.Section title="" style={{backgroundColor:"#fff"}}>
             {tags.map((item)=>(
                 <List.Accordion
-                onPress={()=>{tagRename()}}
+                    key={item.id}
+                    onPress={()=>{tagRename()}}
                     onLongPress={()=>{console.log(1);}}
                     descriptionStyle={{backgroundColor:'red'}}
                     rippleColor={Colors.light.tagBg}
@@ -83,7 +84,7 @@ const CustomDrawer = () => {
                     title={item.name}
                     left={props => <List.Icon {...props} icon="tag-outline" />}>
                     {item.children.map((child)=>(
-                        <List.Item title={child} />
+                        <List.Item key={child} title={child} />
                     ))}
                 </List.Accordion>
             ))}

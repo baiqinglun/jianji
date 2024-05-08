@@ -48,7 +48,7 @@ function CartItem( {notion,cartType} :any) {
     return (
       <View style={styles.container}>
         <View style={styles.time}>
-          <Text style={styles.timeText}>{cartType == "show" ? notion.time : dayjs(notion.time).fromNow()}</Text>
+          <Text style={styles.timeText}>{cartType == "show" ? dayjs(notion.time).format('YYYY-DD-MM HH:mm:ss') : dayjs(notion.time).fromNow()}</Text>
           {/* 弹窗 */}
           <Tooltip
             visible={openList}
