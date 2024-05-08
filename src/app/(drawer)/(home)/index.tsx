@@ -66,7 +66,7 @@ function HomeScreen() {
       {/* 卡片展示 */}
       <FlatList
         data={notions}
-        renderItem={({item})=><CartItem notion={item}/>}
+        renderItem={({item})=><CartItem cartType="show" notion={item}/>}
         contentContainerStyle={{gap:defalutSize,padding:defalutSize*0.5}}/>
 
       {/* 新增按钮 */}

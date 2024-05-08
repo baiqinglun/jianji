@@ -24,9 +24,7 @@ const CustomDrawer = () => {
                 <Text style={styles.username}>用户名</Text>
             </View>
             <View style={styles.setting}>
-                <Link href={"/(drawer)/(setting)"}>
-                    <MaterialIcons name='autorenew' size={28} color={Colors.light.other}/>
-                </Link>
+                <MaterialIcons name='autorenew' size={28} color={Colors.light.other}/>
             </View>
         </View>
 

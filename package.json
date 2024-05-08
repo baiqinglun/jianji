@@ -21,6 +21,7 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@tamagui/babel-plugin": "^1.96.0",
     "@tkow/react-native-modal": "^14.0.1",
+    "dayjs": "^1.11.11",
     "expo": "~50.0.17",
     "expo-clipboard": "~5.0.1",
     "expo-font": "~11.10.3",

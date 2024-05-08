@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import { View,StyleSheet } from 'react-native';
-import { Button,Text, Card, Avatar } from 'react-native-paper';
+import { Button,Text, Card, Avatar, Checkbox } from 'react-native-paper';
 import { Link } from 'expo-router';
 import MyDialog from './Dialog';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -8,14 +8,15 @@ import Colors from '@/constants/Colors';
 import {FontSize,defalutSize} from '@/constants/Size';
 import { Tooltip } from '@rneui/themed';
 
-function CartItem( {notion} :any) {
-    const [textWidth, setTextWidth] = useState(0);
+import relativeTime from 'dayjs/plugin/relativeTime';
+import dayjs from 'dayjs';
+
+dayjs.extend(relativeTime);
+
+function CartItem( {notion,cartType} :any) {
     const [deleteVisible, setDeleteVisible] = useState(false);
     const [openList, setOpenList] = useState(false);
-    const onTextLayout = (event:any) => {
-      const { height } = event.nativeEvent.layout;
-        setTextWidth(height)
-    };
+    const [checked, setChecked] = useState(false);
 
     const hideDialog = () => setDeleteVisible(false);
 
@@ -43,11 +44,11 @@ function CartItem( {notion} :any) {
       setOpenList(!openList)
       setDeleteVisible(!deleteVisible)
     }
-  
+    
     return (
       <View style={styles.container}>
         <View style={styles.time}>
-          <Text style={styles.timeText}>{notion.time}</Text>
+          <Text style={styles.timeText}>{cartType == "show" ? notion.time : dayjs(notion.time).fromNow()}</Text>
           {/* 弹窗 */}
           <Tooltip
             visible={openList}
@@ -65,22 +66,30 @@ function CartItem( {notion} :any) {
               </View>
             }
           >
-            <MaterialIcons
-              name="more-horiz"
-              color={Colors.light.other}
-              size={20} />
+            {
+              cartType == "show" ? <MaterialIcons
+                name="more-horiz"
+                color={Colors.light.other}
+                size={20} /> : <Checkbox
+                color={Colors.light.tint}
+                status={checked ? 'checked' : 'unchecked'}
+                onPress={() => {
+                  setChecked(!checked);
+                }}
+              />
+            }
           </Tooltip>
         </View>
         
         {/* 标签 */}
         <View style={[styles.tag]}>
           <MaterialIcons style={{}} name='sell' color={Colors.light.tagText} size={15}/>
-          <Text style={styles.tagText} onLayout={onTextLayout}>{notion.tags}</Text>
+          <Text style={styles.tagText} >{notion.tags}</Text>
         </View>
         
         {/* 内容 */}
         <Link href={`/${notion.id}`} asChild>
-        <Text style={styles.content}>{notion.content}</Text>
+        <Text numberOfLines={2} style={styles.content}>{notion.content}</Text>
         </Link>
 
       {/* 是否删除弹窗 */}
