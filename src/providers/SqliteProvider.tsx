@@ -12,9 +12,13 @@ type SqliteType = {
 
 const sqls:any = {
     "searchAllNotions":"SELECT * FROM NOTIONS",
-    "insertNotion":"INSERT INTO NOTIONS (content,id,tags,time) VALUES (?, ?, ?, ?)",
-    "updateNotionById":"UPDATE notions SET content = ? WHERE id = ?",
+    "insertNotion":"INSERT INTO NOTIONS (id,content,tag,create_time,update_time) VALUES (?, ?, ?, ?,?)",
+    "updateNotionById":"UPDATE notions SET content = ?,update_time = ? WHERE id = ?",
     "searchNotionById":"SELECT content FROM notions WHERE id = ?",
+    "searchTagNameById":"SELECT name FROM tags WHERE id = ?",
+    "searchTagIdByName":"SELECT id FROM tags WHERE name = ?",
+    "searchChildrenTagsById":"SELECT name FROM tags WHERE father = ?",
+    "searchAllTags":"SELECT * FROM TAGS",
 }
 
 const SqliteContext = createContext<SqliteType>({
@@ -62,13 +66,10 @@ const SqliteProvider = ({children}:PropsWithChildren) => {
                 console.log("数据库不存在");
                 openDb()
             }
-            // return 1
             const readOnly = false;
             return db?.current?.execAsync([{ sql: sqls[type],args: data }],readOnly).then((result:any)=>{
                 const data = result[0]?.rows
                 console.log("执行结果",result[0]?.rows);
-                data.reverse()
-                // func(data)
                 return data
             })
           } catch (error) {

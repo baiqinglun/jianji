@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import {  View ,Text,StyleSheet,Image} from 'react-native';
-import { Link } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
+import {  View ,Text,StyleSheet,Image, FlatList} from 'react-native';
+import { Link, useFocusEffect } from 'expo-router';
 import {  List } from 'react-native-paper';
 import {  MaterialIcons } from '@expo/vector-icons';
 import DivideLine from '@/components/DivideLine';
@@ -9,10 +9,34 @@ import { avaterImage } from '@/constants/Images';
 import { FontSize, defalutSize } from '@/constants/Size';
 import {tags} from '@assets/data/tags'
 import { noteList } from '@assetsdata/noteList';
+import { useSqlite } from '@/providers/SqliteProvider';
+import { useData } from '@/providers/DataProvider';
+import { DrawerActions} from '@react-navigation/native';
 
 const CustomDrawer = () => {
     const [renameModal,setRenameModal] = useState<boolean>(false)
+    const {myTags} = useData()
+    const {exeSql} = useSqlite()
+    console.log();
+    //  useFocusEffect(
+    //   useCallback(() => {
+    //     getData()
+    //     return () => {
+    //       // 离开时发生的事件
+    //     }
+    //   }, [])
+    // );
+
+    useEffect(()=>{
+        getData()
+    })
+  
+    const getData = async () =>{
+       console.log(1,myTags.current);
+    }
+
     const tagRename = () => {
+
     }
     return (
       <View style={styles.container}>
@@ -72,19 +96,30 @@ const CustomDrawer = () => {
         <DivideLine color={Colors.light.other} width={250}/>
         {/* 标签栏 */}
         <List.Section title="" style={{backgroundColor:"#fff"}}>
-            {tags.map((item)=>(
+            {myTags.current.filter((item1:any)=>{
+                    return item1.father == "null"
+                }).map((item2:any)=>(
                 <List.Accordion
-                    key={item.id}
+                    key={item2.id}
                     onPress={()=>{tagRename()}}
                     onLongPress={()=>{console.log(1);}}
                     descriptionStyle={{backgroundColor:'red'}}
                     rippleColor={Colors.light.tagBg}
                     titleStyle={{color:Colors.light.defalutText}}
                     style={{backgroundColor:"#fff"}}
-                    title={item.name}
+                    title={item2.name}
                     left={props => <List.Icon {...props} icon="tag-outline" />}>
-                    {item.children.map((child)=>(
-                        <List.Item key={child} title={child} />
+                    {myTags.current.filter((item3:any)=>{
+                        return item3.father == "null"
+                    }).map((item4:any)=>(
+                        exeSql("searchChildrenTagsById",[item4.id]).then((res2)=>{
+                            res2.map((item5:any)=>{
+                                console.log(4,item5);
+                                return <List.Item key={item5.name} title={item5.name} />
+                            })
+                          })
+                        // return <Text key={child} title={child} />
+                        // return <List.Item key={child} title={child} />
                     ))}
                 </List.Accordion>
             ))}

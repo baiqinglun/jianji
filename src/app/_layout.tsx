@@ -8,6 +8,7 @@ import { PaperProvider } from 'react-native-paper';
 import { useColorScheme } from '@/components/useColorScheme';
 import { LogBox } from 'react-native';
 import SqliteProvider, { useSqlite } from '@/providers/SqliteProvider';
+import DataProvider from '@/providers/DataProvider';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -55,11 +56,13 @@ function RootLayoutNav() {
   return (
       <PaperProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <SqliteProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-            </Stack>
-          </SqliteProvider>
+          <DataProvider>
+            <SqliteProvider>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+              </Stack>
+            </SqliteProvider>
+          </DataProvider>
         </ThemeProvider>
       </PaperProvider>
   );

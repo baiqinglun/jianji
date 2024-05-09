@@ -1,5 +1,5 @@
-import {useState} from 'react';
-import { View,StyleSheet, Pressable } from 'react-native';
+import {useEffect, useState} from 'react';
+import { View,StyleSheet, Pressable, TextInput } from 'react-native';
 import { Button,Text, Card, Avatar, Checkbox } from 'react-native-paper';
 import { Link, useNavigation } from 'expo-router';
 import MyDialog from './Dialog';
@@ -17,8 +17,7 @@ function CartItem( {notion,cartType,func} :any) {
     const [deleteVisible, setDeleteVisible] = useState(false);
     const [openList, setOpenList] = useState(false);
     const [checked, setChecked] = useState(false);
-    const navigation = useNavigation();
-  
+
     const hideDialog = () => setDeleteVisible(false);
 
     const toggleDialog = () => {
@@ -45,11 +44,12 @@ function CartItem( {notion,cartType,func} :any) {
       setOpenList(!openList)
       setDeleteVisible(!deleteVisible)
     }
-    
+
     return (
+      <>
       <View style={styles.container}>
         <View style={styles.time}>
-          <Text style={styles.timeText}>{cartType == "show" ? dayjs(notion.time).format('YYYY-DD-MM HH:mm:ss') : dayjs(notion.time).fromNow()}</Text>
+          <Text style={styles.timeText}>{cartType == "show" ? dayjs(notion.update_time).format('YYYY-MM-DD HH:mm:ss') : dayjs(notion.update_time).fromNow()}</Text>
           {/* 弹窗 */}
           <Tooltip
             visible={openList}
@@ -84,17 +84,18 @@ function CartItem( {notion,cartType,func} :any) {
         
         {/* 标签 */}
         <View style={[styles.tag]}>
-          <MaterialIcons style={{}} name='sell' color={Colors.light.tagText} size={15}/>
-          <Text style={styles.tagText}>{notion.tags}</Text>
+          <MaterialIcons name='sell' color={Colors.light.tagText} size={15}/>
+          <Text style={styles.tagText}>{notion.tag}</Text>
         </View>
         
         {/* 内容 */}
         <Link 
+        style={{height:70}}
         href={{
           pathname:`/${notion.id}`,
           params:{ func:func}
         }}>
-            <Text numberOfLines={2} style={styles.content}>{notion.content}</Text>
+            <Text numberOfLines={1} style={styles.content}>{notion.content}</Text>
         </Link>
 
       {/* 是否删除弹窗 */}
@@ -104,8 +105,8 @@ function CartItem( {notion,cartType,func} :any) {
         onConfirmClick = {toggleDialog}
         onCancelClick = {toggleDialog}
         onDismiss = {hideDialog}/>
-
       </View>
+      </>
     );
   }
 
@@ -114,6 +115,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 container:{
+    flex:1,
     backgroundColor:"#fff",
     width:'100%',
     height:150,
@@ -145,8 +147,10 @@ tagText:{
   padding:2
 },
 content:{
+    marginTop:2,
     color:Colors.light.defalutText,
-    fontSize:FontSize.m
+    fontSize:FontSize.m,
+    lineHeight: 32
 }
 })
 

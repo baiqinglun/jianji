@@ -9,14 +9,15 @@ import CreateNotionModal from '@/components/CreateNotionModal';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { DrawerActions,useNavigation } from '@react-navigation/native';
 import { useSqlite } from '@/providers/SqliteProvider';
+import { useData } from '@/providers/DataProvider';
 
 function HomeScreen() {
   const notionModalRef:any = useRef(null)
-  const [mynotions,setNotions] = useState<any>([])
   const [isModalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation()
   
-  const {exeSql} = useSqlite()
+  const {exeSql,getDbFile} = useSqlite()
+  const {notions,setAllNotions,tags,setTags} = useData()
   // getDbFile()
    useFocusEffect(
     useCallback(() => {
@@ -39,9 +40,18 @@ function HomeScreen() {
   };
 
   // 获取数据并添加至列表
+  // 这里要注意异步循环，要先设置每隔对象的tag值，然后再setNotions
   const getData = async () =>{
-    exeSql("searchAllNotions",[]).then((res)=>{
-      setNotions(res)
+    await exeSql("searchAllNotions",[]).then(async(res)=>{
+      for (let i = 0; i < res.length; i++) {
+        await exeSql("searchTagNameById",[res[i].tag]).then((res2)=>{
+          res[i].tag = res2[0].name
+        })
+      }
+      setAllNotions(res)
+    })
+    await exeSql("searchAllTags",[]).then(async(res)=>{
+      setTags(res)
     })
   }
 
@@ -84,7 +94,7 @@ function HomeScreen() {
 
       {/* 卡片展示 */}
       <FlatList
-        data={mynotions}
+        data={notions.current}
         renderItem={({item})=><CartItem cartType="show" notion={item} func={getData}/>}
         contentContainerStyle={{gap:defalutSize,padding:defalutSize*0.5}}/>
 

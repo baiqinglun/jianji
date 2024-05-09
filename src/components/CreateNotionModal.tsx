@@ -32,23 +32,49 @@ export default forwardRef(({props}:any,ref:any) => {
 
     // 更新数据
     const updata = async () => {
-      console.log(textInput);
-      exeSql("updateNotionById",[textInput,id]).then(()=>{
-        toggleModal();
-        console.log("更新数据成功");
-      })
+      try {
+        exeSql("searchNotionById",[id]).then((res:any)=>{
+          if(res[0]["content"] == textInput) {
+            toggleModal();
+            return;
+          };
+          const updata_time = dayjs().valueOf()
+            exeSql("updateNotionById",[textInput,updata_time,id]).then(()=>{
+              console.log("更新数据成功");
+            })
+          toggleModal();
+        })
+      } catch (error) {
+        throw error
+      }
     }
 
     // 创建灵感
     const create = async () => {
-      const UUID = Crypto.randomUUID();
-      const day = dayjs().valueOf()
-      exeSql("insertNotion",[textInput,UUID,"阅读/曹操传", day]).then(()=>{
-          toggleModal();
-          getData()
-          setTextInput("")
+      try {
+        const id = Crypto.randomUUID();
+        const create_time:any = dayjs().valueOf()
+        const updata_time:any = create_time
+        console.log(id);
+        
+        exeSql("searchTagIdByName",["曹操传"]).then((res)=>{
+          const tag_id = res[0].id
+          exeSql("insertNotion",[id,textInput,tag_id, create_time,updata_time]).then(()=>{
+            toggleModal();
+            getData()
+            setTextInput("")
+          })
         })
-      };
+
+        // exeSql("insertNotion",[id,textInput,"阅读/曹操传", create_time,updata_time]).then(()=>{
+        //     toggleModal();
+        //     getData()
+        //     setTextInput("")
+        //   })
+        }catch (error) {
+          throw error
+        } 
+      }
     
     return (
     <>
