@@ -9,7 +9,9 @@ type SqliteType = {
     getDbFile:() => void;
     setDb:(str:boolean) => void;
     exeSelectAll:(func:any) => void;
-    exeInsert:(data:[],func:any) => void;
+    exeInsert:(data:any[],func:any) => void;
+    exeSelectById:(id:string,func:any) => void;
+    exeUpdate:(data:any[]) => Promise<void>;
 }
 
 const SqliteContext = createContext<SqliteType>({
@@ -18,7 +20,9 @@ const SqliteContext = createContext<SqliteType>({
     getDbFile:()=>{},
     setDb:()=>{},
     exeSelectAll:()=>{},
-    exeInsert:()=>{}
+    exeInsert:()=>{},
+    exeSelectById:()=>{},
+    exeUpdate:async()=>{}
 })
 
 const SqliteProvider = ({children}:PropsWithChildren) => {
@@ -60,8 +64,7 @@ const SqliteProvider = ({children}:PropsWithChildren) => {
                 openDb()
             }
             const readOnly = false;
-            console.log("查询全部时db=",db?.current?._db?._name);
-            await db?.current?.execAsync([{ sql: 'SELECT * FROM NOTIONS',args: [] }],readOnly).then((result)=>{
+            await db?.current?.execAsync([{ sql: 'SELECT * FROM NOTIONS',args: [] }],readOnly).then((result:any)=>{
                 console.log("查询全部成功");
                 const data = result[0]?.rows
                 console.log("查询全部结果",result[0]?.rows);
@@ -90,10 +93,48 @@ const SqliteProvider = ({children}:PropsWithChildren) => {
             console.error('插入An error occurred:', error);
           }
     }
-  
+
+    // 通过id查询
+    const exeSelectById = async (id:any,func:any) => {
+        try {
+            if(db.current==null){
+                console.log("通过id查询时数据库不存在");
+                openDb()
+            }
+            const readOnly = false;
+            await db?.current?.execAsync([{ sql: 'SELECT content FROM notions WHERE id = ?',args: [id] }],readOnly).then((result:any)=>{
+                if (result[0]?.rows?.length > 0) {
+                    console.log("通过id查询成功",result[0].rows[0]);
+                    const {content} = result[0].rows[0]; // 假设只返回一行，取第一行的 ID
+                    func(content)
+                } else {
+                console.log("No matching rows found.");
+                }
+            })
+          } catch (error) {
+            console.error('通过id查询An error occurred:', error);
+          }
+    }
+
     
+    // 更改数据
+    const exeUpdate = async (data:any) => {
+        try {
+            if(db.current==null){
+                console.log("通过id查询时数据库不存在");
+                openDb()
+            }
+            const readOnly = false;
+            await db?.current?.execAsync([{ sql: 'UPDATE notions SET content = ? WHERE id = ?',args: data }],readOnly).then((result:any)=>{
+                console.log("更改成功");
+            })
+          } catch (error) {
+            console.error('更改数据An error occurred:', error);
+          }
+    }
+
     return (
-        <SqliteContext.Provider value={{db,openDb,getDbFile,exeSelectAll,exeInsert}}>
+        <SqliteContext.Provider value={{db,openDb,getDbFile,exeSelectAll,exeInsert,exeSelectById,exeUpdate}}>
             {children}
         </SqliteContext.Provider>
     )

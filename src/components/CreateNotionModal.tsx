@@ -3,16 +3,14 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } f
 import { FontSize, defalutSize } from '@/constants/Size';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
-import notions from '@assetsdata/notions';
 import { pasteFromClipboard } from '@/libs/Clipboard';
-import { exeUpdate, loadDatabase } from '@/libs/Sqlite';
 import * as Crypto from 'expo-crypto';
 import dayjs from 'dayjs';
 import { useSqlite } from '@/providers/SqliteProvider';
 
 export default forwardRef(({props}:any,ref:any) => {
     const [textInput,setTextInput] = useState<string | undefined>("")
-    const {exeInsert} = useSqlite()
+    const {exeInsert,exeUpdate} = useSqlite()
     // 获取父组件传递的值与方法
     const inputRef:any = useRef(null)
     const {toggleModal,isModalVisible,getData,id} = props
@@ -45,9 +43,11 @@ export default forwardRef(({props}:any,ref:any) => {
 
     // 更新数据
     const updata = async () => {
-      await toggleModal();
       console.log(textInput);
-      exeUpdate([textInput,id],getData)
+      exeUpdate([textInput,id]).then(()=>{
+        toggleModal();
+        console.log("更新数据成功");
+      })
     }
 
     // 创建灵感
@@ -56,7 +56,7 @@ export default forwardRef(({props}:any,ref:any) => {
         const UUID = Crypto.randomUUID();
         const day = dayjs().valueOf()
         console.log(UUID);
-        await exeInsert([textInput,UUID,"阅读/曹操传", day],getData)
+        exeInsert([textInput,UUID,"阅读/曹操传", day],getData)
         console.log(day);
         setTextInput("")
       };

@@ -7,12 +7,14 @@ import {FontSize,defalutSize} from '@/constants/Size';
 import { useLocalSearchParams } from 'expo-router';
 import { Dialog } from '@rneui/themed';
 import CreateNotionModal from '@/components/CreateNotionModal';
-import { exeSelectById } from '@/libs/Sqlite';
+import { useSqlite } from '@/providers/SqliteProvider';
+// import { exeSelectById } from '@/libs/Sqlite';
 
 const IdScreen = () => {
     const {id}:any = useLocalSearchParams();
     const [isModalVisible, setModalVisible] = useState(false);
     const notionModalRef:any = useRef(null)
+    const {exeSelectById} = useSqlite()
     
     const getDataById = async () => {
       exeSelectById(id,notionModalRef?.current?.setTextInput)
