@@ -59,21 +59,20 @@ const SqliteProvider = ({children}:PropsWithChildren) => {
     const exeSql = async (type:string,data:any[]) => {
         try {
             if(db.current==null){
-                console.log("查询全部时数据库不存在");
+                console.log("数据库不存在");
                 openDb()
             }
             // return 1
             const readOnly = false;
             return db?.current?.execAsync([{ sql: sqls[type],args: data }],readOnly).then((result:any)=>{
-                console.log("查询全部成功");
                 const data = result[0]?.rows
-                console.log("查询全部结果",result[0]?.rows);
+                console.log("执行结果",result[0]?.rows);
                 data.reverse()
                 // func(data)
                 return data
             })
           } catch (error) {
-            console.error('查询全部An error occurred:', error);
+            console.error('An error occurred:', error);
             throw error;
           }
       }
