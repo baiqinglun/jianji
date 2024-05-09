@@ -3,7 +3,6 @@ import {Pressable, View,StyleSheet, FlatList, Modal, Alert,  Keyboard } from 're
 import { Stack,Link,Navigator, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '@/constants/Colors';
-import notions from '@assets/data/notions';
 import {FontSize,defalutSize} from '@/constants/Size';
 import CartItem from '@/components/CartItem';
 import CreateNotionModal from '@/components/CreateNotionModal';
@@ -17,17 +16,12 @@ function HomeScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation()
   
-  const {exeSelectAll} = useSqlite()
-
-  const {getDb,db} = useSqlite()
-
-  const get  = async() => {
-    await getDb()
-  }
-  useEffect(() => {
-    exeSelectAll(setNotions)
-    get();
-  }, []);
+  const {db,getDbFile,exeSelectAll} = useSqlite()
+  // getDbFile()
+  // useEffect(() => {
+  //   exeSelectAll(setNotions)
+  //   console.log("15");
+  // }, [db]);
 
   // useEffect(() => {
   //   const unsubscribe = navigation.addListener('focus', async() => {
@@ -37,12 +31,14 @@ function HomeScreen() {
   //   return unsubscribe;
   // }, [navigation]);
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     getData()
-  //     return () => null
-  //   }, [])
-  // );
+  useFocusEffect(
+    useCallback(() => {
+      exeSelectAll(setNotions)
+      return () => {
+        // 离开时发生的事件
+      }
+    }, [])
+  );
 
   // 切换模态框
   const toggleModal = () => {
@@ -51,18 +47,14 @@ function HomeScreen() {
 
   // 添加灵感模态框
   const openModal = async () => {
-    await toggleModal()
+    toggleModal()
     notionModalRef?.current?.inputOnFocus()
   };
 
   // 获取数据并添加至列表
-  const getData = async() =>{
-    // await exeSelectAll(setNotions)
+  const getData = async () =>{
+    await exeSelectAll(setNotions)
   }
-
-  useEffect(() =>{
-    getData()
-  },[])
 
   return (
     <View style={styles.container}>

@@ -8,11 +8,11 @@ import { pasteFromClipboard } from '@/libs/Clipboard';
 import { exeUpdate, loadDatabase } from '@/libs/Sqlite';
 import * as Crypto from 'expo-crypto';
 import dayjs from 'dayjs';
-import { exeInsert } from '@/libs/Sqlite';
+import { useSqlite } from '@/providers/SqliteProvider';
 
 export default forwardRef(({props}:any,ref:any) => {
     const [textInput,setTextInput] = useState<string | undefined>("")
-    
+    const {exeInsert} = useSqlite()
     // 获取父组件传递的值与方法
     const inputRef:any = useRef(null)
     const {toggleModal,isModalVisible,getData,id} = props
@@ -56,7 +56,7 @@ export default forwardRef(({props}:any,ref:any) => {
         const UUID = Crypto.randomUUID();
         const day = dayjs().valueOf()
         console.log(UUID);
-        await exeInsert([UUID,textInput,"阅读/曹操传", day],getData)
+        await exeInsert([textInput,UUID,"阅读/曹操传", day],getData)
         console.log(day);
         setTextInput("")
       };

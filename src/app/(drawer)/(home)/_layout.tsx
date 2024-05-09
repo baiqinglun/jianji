@@ -1,3 +1,4 @@
+import SqliteProvider from '@/providers/SqliteProvider'
 import {  Stack } from 'expo-router'
 
 const Layout = () => {

@@ -53,14 +53,14 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <SqliteProvider>
       <PaperProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <SqliteProvider>
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
             </Stack>
+          </SqliteProvider>
         </ThemeProvider>
       </PaperProvider>
-    </SqliteProvider>
   );
 }
