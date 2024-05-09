@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import {  View ,Text,StyleSheet,Image, FlatList} from 'react-native';
+import {  View ,Text,StyleSheet,Image, FlatList, ScrollView} from 'react-native';
 import { Link, useFocusEffect } from 'expo-router';
 import {  List } from 'react-native-paper';
 import {  MaterialIcons } from '@expo/vector-icons';
@@ -17,7 +17,7 @@ const CustomDrawer = () => {
     const [renameModal,setRenameModal] = useState<boolean>(false)
     const {myTags} = useData()
     const {exeSql} = useSqlite()
-    console.log();
+    const [tags,setTags] = useState([])
     //  useFocusEffect(
     //   useCallback(() => {
     //     getData()
@@ -29,7 +29,8 @@ const CustomDrawer = () => {
 
     useEffect(()=>{
         getData()
-    })
+       
+    },[])
   
     const getData = async () =>{
        console.log(1,myTags.current);
@@ -39,6 +40,7 @@ const CustomDrawer = () => {
 
     }
     return (
+        <ScrollView>
       <View style={styles.container}>
         {/* 顶部用户信息 */}
         <View style={styles.top}>
@@ -109,18 +111,13 @@ const CustomDrawer = () => {
                     style={{backgroundColor:"#fff"}}
                     title={item2.name}
                     left={props => <List.Icon {...props} icon="tag-outline" />}>
-                    {myTags.current.filter((item3:any)=>{
-                        return item3.father == "null"
-                    }).map((item4:any)=>(
-                        exeSql("searchChildrenTagsById",[item4.id]).then((res2)=>{
-                            res2.map((item5:any)=>{
-                                console.log(4,item5);
-                                return <List.Item key={item5.name} title={item5.name} />
-                            })
-                          })
-                        // return <Text key={child} title={child} />
-                        // return <List.Item key={child} title={child} />
-                    ))}
+                    {
+                        myTags.current.filter((item3:any)=>{
+                            return item3.father == item2.id
+                        }).map((item4:any)=>(
+                            <List.Item key={item4.name} title={item4.name}></List.Item>
+                        ))
+                    }
                 </List.Accordion>
             ))}
         </List.Section>
@@ -152,6 +149,7 @@ const CustomDrawer = () => {
             </Link>
         </List.Section>
       </View>
+      </ScrollView>
     );
   };
 

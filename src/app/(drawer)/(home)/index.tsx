@@ -48,6 +48,8 @@ function HomeScreen() {
           res[i].tag = res2[0].name
         })
       }
+      console.log(res);
+      
       setAllNotions(res)
     })
     await exeSql("searchAllTags",[]).then(async(res)=>{
