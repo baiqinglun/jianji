@@ -18,7 +18,7 @@ function HomeScreen() {
   
   const {exeSql,getDbFile} = useSqlite()
   const {notions,setAllNotions,tags,setTags} = useData()
-  // getDbFile()
+  getDbFile()
    useFocusEffect(
     useCallback(() => {
       getData()
@@ -48,8 +48,6 @@ function HomeScreen() {
           res[i].tag = res2[0].name
         })
       }
-      console.log(res);
-      
       setAllNotions(res)
     })
     await exeSql("searchAllTags",[]).then(async(res)=>{

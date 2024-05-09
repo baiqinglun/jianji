@@ -19,6 +19,7 @@ const sqls:any = {
     "searchTagIdByName":"SELECT id FROM tags WHERE name = ?",
     "searchChildrenTagsById":"SELECT name FROM tags WHERE father = ?",
     "searchAllTags":"SELECT * FROM TAGS",
+    "insertTag":"INSERT INTO TAGS (id,name,father,create_time,update_time) VALUES (?, ?, ?, ?,?)",
 }
 
 const SqliteContext = createContext<SqliteType>({

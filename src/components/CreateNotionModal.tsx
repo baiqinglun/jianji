@@ -2,14 +2,17 @@ import { View, Text, Modal, Alert ,StyleSheet, TextInput, Keyboard, Pressable} f
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { FontSize, defalutSize } from '@/constants/Size';
 import Colors from '@/constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { pasteFromClipboard } from '@/libs/Clipboard';
 import * as Crypto from 'expo-crypto';
 import dayjs from 'dayjs';
 import { useSqlite } from '@/providers/SqliteProvider';
+import { Divider } from 'react-native-paper';
+import { useData } from '@/providers/DataProvider';
 
 export default forwardRef(({props}:any,ref:any) => {
     const [textInput,setTextInput] = useState<string | undefined>("")
+    const [tagInput,setTagInput] = useState<string | undefined>("")
     const {exeSql} = useSqlite()
     // 获取父组件传递的值与方法
     const inputRef:any = useRef(null)
@@ -22,12 +25,14 @@ export default forwardRef(({props}:any,ref:any) => {
 
     // 切换模态框
     const inputOnFocus = () => {
-        if(isModalVisible){
-            inputRef?.current?.focus();
-            setTimeout(() => {
-                Keyboard.dismiss()
-            }, 10);
-        }
+        // if(isModalVisible){
+        //     inputRef?.current?.focus();
+        //     setTimeout(() => {
+        //         Keyboard.dismiss()
+        //     }, 10);
+        // }
+        console.log(111);
+        
     };
 
     // 更新数据
@@ -55,23 +60,27 @@ export default forwardRef(({props}:any,ref:any) => {
         const id = Crypto.randomUUID();
         const create_time:any = dayjs().valueOf()
         const updata_time:any = create_time
-        console.log(id);
         
-        exeSql("searchTagIdByName",["曹操传"]).then((res)=>{
-          const tag_id = res[0].id
-          exeSql("insertNotion",[id,textInput,tag_id, create_time,updata_time]).then(()=>{
-            toggleModal();
-            getData()
-            setTextInput("")
-          })
-        })
+        exeSql("searchTagIdByName",[tagInput]).then((res)=>{
+          if(res.length == 0){
+              const newTagId = Crypto.randomUUID();
+              exeSql("insertTag",[newTagId,tagInput,"null",create_time,updata_time]).then((res)=>{
+                exeSql("insertNotion",[id,textInput,newTagId, create_time,updata_time]).then(()=>{
+                  toggleModal();
+                  getData()
+                  setTextInput("")
+                })
+              })
 
-        // exeSql("insertNotion",[id,textInput,"阅读/曹操传", create_time,updata_time]).then(()=>{
-        //     toggleModal();
-        //     getData()
-        //     setTextInput("")
-        //   })
-        }catch (error) {
+            }
+            exeSql("insertNotion",[id,textInput,res[0]?.id, create_time,updata_time]).then(()=>{
+              toggleModal();
+              getData()
+              setTextInput("")
+            })
+        })
+      }
+        catch (error) {
           throw error
         } 
       }
@@ -80,14 +89,29 @@ export default forwardRef(({props}:any,ref:any) => {
     <>
         <View style={styles.centeredView}>
             <View style={styles.modalView}>
+              <View style={{flexDirection:'row',alignItems:'center'}}>
+              <Ionicons
+                color={Colors.light.tint}
+                name="pricetags-outline"
+                size={27}
+                style={{ }}
+                />
+                  <TextInput
+                  style={[styles.inputTags,{textAlign:'center'}]}
+                  maxLength={20}
+                  value={tagInput}
+                  ref={inputRef}
+                  onChangeText={text => setTagInput(text)}/>
+              </View>
+                <Divider />
                 <TextInput
                 multiline={true}
-                style={styles.input}
+                style={styles.inputText}
                 maxLength={1000}
-                autoFocus={true}
+                // autoFocus={true}
                 value={textInput}
                 ref={inputRef}
-                onBlur={()=>{inputRef?.current?.focus()}}
+                onBlur={()=>{}}
                 onChangeText={text => setTextInput(text)}/>
 
                 <View style={styles.modalBtn}>
@@ -134,11 +158,20 @@ const styles = StyleSheet.create({
       backgroundColor: "#fff",
       borderRadius: 5,
       paddingLeft: 5,
-      height:350,
+      height:400,
       width:300,
       elevation: 2
     },
-    input:{
+    inputTags:{
+      backgroundColor:"#fff",
+      width:250,
+      height:40,
+      textAlignVertical: 'top',
+      paddingHorizontal:defalutSize*0.5,
+      paddingVertical:defalutSize,
+      fontSize:FontSize.m,
+    },
+    inputText:{
       backgroundColor:"#fff",
       height:300,
       textAlignVertical: 'top',
