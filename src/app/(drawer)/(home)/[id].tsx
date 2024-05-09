@@ -14,10 +14,12 @@ const IdScreen = () => {
     const {id}:any = useLocalSearchParams();
     const [isModalVisible, setModalVisible] = useState(false);
     const notionModalRef:any = useRef(null)
-    const {exeSelectById} = useSqlite()
+    const {exeSql} = useSqlite()
     
     const getDataById = async () => {
-      exeSelectById(id,notionModalRef?.current?.setTextInput)
+      exeSql("searchNotionById",[id]).then((res:any)=>{
+        notionModalRef?.current?.setTextInput(res[0]["content"])
+      })
     }
 
     useEffect(()=>{

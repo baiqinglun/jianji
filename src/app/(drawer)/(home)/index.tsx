@@ -12,28 +12,15 @@ import { useSqlite } from '@/providers/SqliteProvider';
 
 function HomeScreen() {
   const notionModalRef:any = useRef(null)
-  const [mynotions,setNotions] = useState([])
+  const [mynotions,setNotions] = useState<any>([])
   const [isModalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation()
   
-  const {db,getDbFile,exeSelectAll} = useSqlite()
+  const {exeSql} = useSqlite()
   // getDbFile()
-  // useEffect(() => {
-  //   exeSelectAll(setNotions)
-  //   console.log("15");
-  // }, [db]);
-
-  // useEffect(() => {
-  //   const unsubscribe = navigation.addListener('focus', async() => {
-  //     await getData()
-  //     console.log(1);
-  //   });
-  //   return unsubscribe;
-  // }, [navigation]);
-
-  useFocusEffect(
+   useFocusEffect(
     useCallback(() => {
-      exeSelectAll(setNotions)
+      getData()
       return () => {
         // 离开时发生的事件
       }
@@ -53,7 +40,9 @@ function HomeScreen() {
 
   // 获取数据并添加至列表
   const getData = async () =>{
-    await exeSelectAll(setNotions)
+    exeSql("searchAllNotions",[]).then((res)=>{
+      setNotions(res)
+    })
   }
 
   return (

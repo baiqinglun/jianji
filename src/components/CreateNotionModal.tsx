@@ -10,7 +10,7 @@ import { useSqlite } from '@/providers/SqliteProvider';
 
 export default forwardRef(({props}:any,ref:any) => {
     const [textInput,setTextInput] = useState<string | undefined>("")
-    const {exeInsert,exeUpdate} = useSqlite()
+    const {exeSql} = useSqlite()
     // 获取父组件传递的值与方法
     const inputRef:any = useRef(null)
     const {toggleModal,isModalVisible,getData,id} = props
@@ -30,21 +30,10 @@ export default forwardRef(({props}:any,ref:any) => {
         }
     };
 
-    const send = async () => {
-      if(id){
-        console.log("update");
-        await updata()
-      }else{
-        console.log("create");
-        await create()
-        console.log("create2");
-      }
-    }
-
     // 更新数据
     const updata = async () => {
       console.log(textInput);
-      exeUpdate([textInput,id]).then(()=>{
+      exeSql("updateNotionById",[textInput,id]).then(()=>{
         toggleModal();
         console.log("更新数据成功");
       })
@@ -52,13 +41,13 @@ export default forwardRef(({props}:any,ref:any) => {
 
     // 创建灵感
     const create = async () => {
-        toggleModal();
-        const UUID = Crypto.randomUUID();
-        const day = dayjs().valueOf()
-        console.log(UUID);
-        exeInsert([textInput,UUID,"阅读/曹操传", day],getData)
-        console.log(day);
-        setTextInput("")
+      const UUID = Crypto.randomUUID();
+      const day = dayjs().valueOf()
+      exeSql("insertNotion",[textInput,UUID,"阅读/曹操传", day]).then(()=>{
+          toggleModal();
+          getData()
+          setTextInput("")
+        })
       };
     
     return (
@@ -92,7 +81,7 @@ export default forwardRef(({props}:any,ref:any) => {
                     />
                     )}
                 </Pressable>
-                <Pressable onPress={send}>
+                <Pressable onPress={()=>{id ? updata() : create()}}>
                     {({ pressed }) => (
                     <Ionicons
                         color={Colors.light.tint}
