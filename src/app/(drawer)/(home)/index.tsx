@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState} from 'react';
-import {Pressable, View,StyleSheet, FlatList, Modal, Alert,  Keyboard } from 'react-native';
+import {Pressable, View,StyleSheet, FlatList, Modal, Alert,  Keyboard,Text } from 'react-native';
 import { Stack,Link,Navigator, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '@/constants/Colors';
@@ -10,12 +10,14 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { DrawerActions,useNavigation } from '@react-navigation/native';
 import { useSqlite } from '@/providers/SqliteProvider';
 import { useData } from '@/providers/DataProvider';
+import { styled } from 'nativewind';
+const StyledText = styled(Text)
 
 function HomeScreen() {
   const notionModalRef:any = useRef(null)
   const [isModalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation()
-  
+  const yellow = "grey"
   const {exeSql,getDbFile} = useSqlite()
   const {notions,setAllNotions,tags,setTags} = useData()
   getDbFile()
@@ -109,6 +111,7 @@ function HomeScreen() {
               style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
             />
           )}
+          
         </Pressable>
       </View>
       

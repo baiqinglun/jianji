@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import { useSqlite } from '@/providers/SqliteProvider';
 import { Divider } from 'react-native-paper';
 import { useData } from '@/providers/DataProvider';
+import { windowWidth } from '@/constants/Dimensions';
 
 export default forwardRef(({props}:any,ref:any) => {
     const [textInput,setTextInput] = useState<string | undefined>("")
@@ -164,7 +165,7 @@ const styles = StyleSheet.create({
     },
     inputTags:{
       backgroundColor:"#fff",
-      width:250,
+      width:windowWidth*0.5,
       height:40,
       textAlignVertical: 'top',
       paddingHorizontal:defalutSize*0.5,
