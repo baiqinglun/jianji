@@ -20,16 +20,20 @@ import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { useSqlite } from "@/providers/SqliteProvider";
 import { useData } from "@/providers/DataProvider";
 import { styled } from "nativewind";
+import { isLoading } from "expo-font";
+import { ActivityIndicator } from "react-native-paper";
 const StyledText = styled(Text);
 
 function HomeScreen() {
   const notionModalRef: any = useRef(null);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isLodingData, setIsLodingData] = useState(true);
   const navigation = useNavigation();
-  const yellow = "grey";
   const { exeSql, getDbFile } = useSqlite();
   const { notions, setAllNotions, tags, setTags } = useData();
-  getDbFile();
+  // getDbFile();
+
+  // 页面聚焦时事件
   useFocusEffect(
     useCallback(() => {
       getData();
@@ -51,19 +55,26 @@ function HomeScreen() {
   };
 
   // 获取数据并添加至列表
-  // 这里要注意异步循环，要先设置每隔对象的tag值，然后再setNotions
+  // 这里要注意异步循环，要先设置每个对象的tag值，然后再setNotions
+  // 先全部获取异步数据，然后再赋值
   const getData = async () => {
-    await exeSql("searchAllNotions", []).then(async res => {
+    setIsLodingData(true); // 设置加载状态为 true
+    const notionsPromise = exeSql("searchAllNotions", []).then(async res => {
       for (let i = 0; i < res.length; i++) {
         await exeSql("searchTagNameById", [res[i].tag]).then(res2 => {
           res[i].tag = res2[0].name;
         });
       }
-      setAllNotions(res);
+      return res;
     });
-    await exeSql("searchAllTags", []).then(async res => {
-      setTags(res);
-    });
+
+    const tagsPromise = exeSql("searchAllTags", []);
+
+    const [notions, tags] = await Promise.all([notionsPromise, tagsPromise]);
+
+    setAllNotions(notions);
+    setTags(tags);
+    setIsLodingData(false);
   };
 
   return (
@@ -110,18 +121,29 @@ function HomeScreen() {
         }}
       ></Stack.Screen>
 
-      {/* 卡片展示 */}
-      <FlatList
-        data={notions.current}
-        renderItem={({ item }) => (
-          <CartItem
-            cartType="show"
-            notion={item}
-            func={getData}
-          />
-        )}
-        contentContainerStyle={{ gap: defalutSize, padding: defalutSize * 0.5 }}
-      />
+      {/* 数据展示卡片 */}
+
+      {isLodingData ? (
+        <ActivityIndicator
+          animating={isLodingData}
+          color={Colors.light.tint}
+        />
+      ) : (
+        <FlatList
+          data={notions.current}
+          renderItem={({ item }) => (
+            <CartItem
+              cartType="show"
+              notion={item}
+              func={getData}
+            />
+          )}
+          contentContainerStyle={{
+            gap: defalutSize,
+            padding: defalutSize * 0.5,
+          }}
+        />
+      )}
 
       {/* 新增按钮 */}
       <View style={styles.button}>
