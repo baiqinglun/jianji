@@ -79,7 +79,7 @@ function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      {/* 头 */}
+      {/* 栈头 */}
       <Stack.Screen
         options={{
           title: "简记",
@@ -122,7 +122,6 @@ function HomeScreen() {
       ></Stack.Screen>
 
       {/* 数据展示卡片 */}
-
       {isLodingData ? (
         <ActivityIndicator
           animating={isLodingData}
@@ -145,7 +144,7 @@ function HomeScreen() {
         />
       )}
 
-      {/* 新增按钮 */}
+      {/* 右下角新增按钮 */}
       <View style={styles.button}>
         <Pressable
           onPress={() => {

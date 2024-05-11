@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  ScrollView,
+} from "react-native";
 import React, {
   forwardRef,
   useImperativeHandle,
@@ -7,7 +14,7 @@ import React, {
 } from "react";
 import { FontSize, defalutSize } from "@/constants/Size";
 import Colors from "@/constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { pasteFromClipboard } from "@/libs/Clipboard";
 import * as Crypto from "expo-crypto";
 import dayjs from "dayjs";
@@ -49,8 +56,8 @@ export default forwardRef(({ props }: any, ref: any) => {
 
   // 选择标签后
   const selectTag = (tagid: string, tagname: string) => {
+    console.log(tagname);
     setSelectedTag(tagid);
-    console.log(tagid);
     setIsShowTagsPop(false);
     setTagInput(tagname);
   };
@@ -126,6 +133,7 @@ export default forwardRef(({ props }: any, ref: any) => {
     }
   };
 
+  // 渲染标签列表弹窗
   const renderTagPopItem = () => {
     return (
       <View style={styles.tagModal}>
@@ -135,17 +143,17 @@ export default forwardRef(({ props }: any, ref: any) => {
               tagItem.name.toLowerCase().includes(tagInput),
             )
             .map((tagItem: any) => {
-              const father_name: string = tagItem?.father
-                ? myTags?.current.map((item: any) => {
-                    if (item.id == tagItem?.father) {
-                      return item.name + "/";
-                    }
-                  })
+              let father_name: string = tagItem?.father
+                ? (myTags?.current.find(
+                    (item: any) => item.id === tagItem?.father,
+                  )?.name || "") + "/"
                 : "";
+              // 如果father_name为/（表示没有father），则重新赋值为空
+              father_name = father_name === "/" ? "" : father_name;
               return (
                 <Text
                   onPress={() => {
-                    selectTag(tagItem.id, `#${father_name}${tagItem.name}`);
+                    selectTag(tagItem.id, `${father_name}${tagItem.name}`);
                   }}
                   style={styles.tagText}
                   key={tagItem.id}
@@ -163,45 +171,41 @@ export default forwardRef(({ props }: any, ref: any) => {
     <>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          {/* 上部标签 */}
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
+          {/* 上部标签输入 */}
+          <View style={styles.tagInputContainer}>
             <Pressable
+              style={styles.tagIcon}
               onPress={() => {
-                showTagsPop();
+                console.log(555);
+                setIsShowTagsPop(!isShowTagsPop);
               }}
             >
               <Ionicons
                 color={Colors.light.tint}
                 name="pricetags-outline"
                 size={27}
-                style={{}}
-              />
-              <TextInput
-                style={[
-                  styles.inputTags,
-                  {
-                    textAlign: "center",
-                  },
-                ]}
-                maxLength={20}
-                value={tagInput}
-                ref={inputTagRef}
-                onChangeText={text => {
-                  inputTagChange(text);
-                }}
-                onBlur={() => {
-                  setIsShowTagsPop(false);
-                }}
               />
             </Pressable>
+            <TextInput
+              style={styles.inputTags}
+              onFocus={() => {
+                showTagsPop();
+              }}
+              maxLength={20}
+              value={tagInput}
+              ref={inputTagRef}
+              onChangeText={text => {
+                inputTagChange(text);
+              }}
+              onBlur={() => {
+                setIsShowTagsPop(false);
+              }}
+            />
           </View>
+
           {/* 分割线 */}
           <Divider />
+
           {/* 内容输入框 */}
           <View
             style={{
@@ -224,6 +228,8 @@ export default forwardRef(({ props }: any, ref: any) => {
             {/* 显示tags弹窗 */}
             {renderTagPopItem()}
           </View>
+
+          {/* 底部按钮 */}
           <View style={styles.modalBtn}>
             <Pressable
               onPress={() => {
@@ -231,10 +237,19 @@ export default forwardRef(({ props }: any, ref: any) => {
               }}
             >
               {/* <Pressable onPress={()=>{} }> */}
-              {({ pressed }) => <Text style={styles.cancel}>取消</Text>}
+              {({}) => <Text style={styles.cancel}>取消</Text>}
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                setTextInput("");
+              }}
+            >
+              {({}) => <Text style={styles.cancel}>清空</Text>}
             </Pressable>
             <Pressable
               onPress={async () => {
+                inputRef?.current?.focus();
+                setIsShowTagsPop(false);
                 setTextInput(await pasteFromClipboard(textInput));
               }}
             >
@@ -250,6 +265,7 @@ export default forwardRef(({ props }: any, ref: any) => {
                 />
               )}
             </Pressable>
+
             <Pressable
               onPress={() => {
                 id ? updata() : create();
@@ -288,12 +304,19 @@ const styles = StyleSheet.create({
     width: windowWidth * 0.8,
     elevation: 2,
   },
-  inputTags: {
-    backgroundColor: "#fff",
-    width: windowWidth * 0.5,
+  tagInputContainer: {
     height: 40,
-    textAlignVertical: "top",
-    paddingHorizontal: defalutSize * 0.5,
+  },
+  tagIcon: {
+    position: "absolute",
+    height: 30,
+    width: 30,
+    left: 5,
+    bottom: 5,
+  },
+  inputTags: {
+    flex: 1,
+    textAlign: "center",
     paddingVertical: defalutSize,
     fontSize: FontSize.m,
   },
@@ -307,11 +330,13 @@ const styles = StyleSheet.create({
   modalBtn: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: defalutSize,
+    marginTop: "auto",
   },
   cancel: {
     color: Colors.light.tagText,
     marginLeft: 10,
-    marginTop: 10,
     fontSize: FontSize.m,
   },
   tagModal: {
@@ -325,6 +350,7 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: FontSize.m,
     color: Colors.light.tagText,
-    paddingHorizontal: defalutSize * 0.2,
+    paddingVertical: defalutSize * 0.1,
+    paddingHorizontal: defalutSize * 0.4,
   },
 });
