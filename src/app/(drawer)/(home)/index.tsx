@@ -1,14 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Pressable,
-  View,
-  StyleSheet,
-  FlatList,
-  Modal,
-  Alert,
-  Keyboard,
-  Text,
-} from "react-native";
+import { Pressable, View, StyleSheet, FlatList, Modal } from "react-native";
 import { Stack, Link, Navigator, useFocusEffect } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Colors from "@/constants/Colors";
@@ -18,20 +9,26 @@ import CreateNotionModal from "@/components/CreateNotionModal";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { useSqlite } from "@/providers/SqliteProvider";
-import { useData } from "@/providers/DataProvider";
-import { styled } from "nativewind";
-import { isLoading } from "expo-font";
 import { ActivityIndicator } from "react-native-paper";
-const StyledText = styled(Text);
+import * as Crypto from "expo-crypto";
+import styles from "./index.styles";
 
 function HomeScreen() {
   const notionModalRef: any = useRef(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [isLodingData, setIsLodingData] = useState(true);
   const navigation = useNavigation();
+  const [notions, setNotions] = useState([]);
+  const [tags, setTags] = useState([]);
   const { exeSql, getDbFile } = useSqlite();
-  const { notions, setAllNotions, tags, setTags } = useData();
-  // getDbFile();
+  getDbFile();
+
+  // useEffect(() => {
+  //   const asysnGetData = async () => {
+  //     await getData();
+  //   };
+  //   asysnGetData();
+  // });
 
   // 页面聚焦时事件
   useFocusEffect(
@@ -59,21 +56,33 @@ function HomeScreen() {
   // 先全部获取异步数据，然后再赋值
   const getData = async () => {
     setIsLodingData(true); // 设置加载状态为 true
-    const notionsPromise = exeSql("searchAllNotions", []).then(async res => {
-      for (let i = 0; i < res.length; i++) {
-        await exeSql("searchTagNameById", [res[i].tag]).then(res2 => {
-          res[i].tag = res2[0].name;
-        });
-      }
-      return res;
-    });
 
-    const tagsPromise = exeSql("searchAllTags", []);
+    await exeSql("searchAllNotions", [])
+      .then(
+        async res => {
+          console.log("res1-1=", res);
+          for (let i = 0; i < res.rows.length; i++) {
+            await exeSql("searchTagNameById", [res.rows[i].tag]).then(res2 => {
+              res.rows[i].tag = res2.rows[0].name;
+            });
+          }
+          console.log("res1-2=", res);
 
-    const [notions, tags] = await Promise.all([notionsPromise, tagsPromise]);
+          setNotions(res.rows);
+        },
+        () => {},
+      )
+      .finally(() => {});
 
-    setAllNotions(notions);
-    setTags(tags);
+    await exeSql("searchAllTags", [])
+      .then(
+        async res => {
+          setTags(res.rows);
+        },
+        () => {},
+      )
+      .finally(() => {});
+
     setIsLodingData(false);
   };
 
@@ -129,7 +138,7 @@ function HomeScreen() {
         />
       ) : (
         <FlatList
-          data={notions.current}
+          data={notions}
           renderItem={({ item }) => (
             <CartItem
               cartType="show"
@@ -174,33 +183,12 @@ function HomeScreen() {
       >
         {/* 传递给子组件一些数值及函数 */}
         <CreateNotionModal
-          props={{ toggleModal, isModalVisible, getData }}
+          props={{ toggleModal, isModalVisible, getData, tags }}
           ref={notionModalRef}
         />
       </Modal>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  button: {
-    position: "absolute",
-    justifyContent: "center",
-    bottom: 30,
-    right: 30,
-    backgroundColor: Colors.light.tint,
-    width: 70,
-    height: 70,
-    borderRadius: 70,
-  },
-  buttonIcon: {
-    position: "absolute",
-    bottom: 15,
-    right: 0,
-  },
-});
 
 export default HomeScreen;

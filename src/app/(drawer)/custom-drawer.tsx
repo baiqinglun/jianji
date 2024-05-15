@@ -17,12 +17,10 @@ import { FontSize, defalutSize } from "@/constants/Size";
 import { tags } from "@assets/data/tags";
 import { noteList } from "@assetsdata/noteList";
 import { useSqlite } from "@/providers/SqliteProvider";
-import { useData } from "@/providers/DataProvider";
 import { DrawerActions } from "@react-navigation/native";
 
 const CustomDrawer = () => {
   const [renameModal, setRenameModal] = useState<boolean>(false);
-  const { myTags } = useData();
   const { exeSql } = useSqlite();
   const [tags, setTags] = useState([]);
   //  useFocusEffect(
@@ -39,7 +37,7 @@ const CustomDrawer = () => {
   }, []);
 
   const getData = async () => {
-    console.log(1, myTags.current);
+    console.log(1, tags);
   };
 
   const tagRename = () => {};
@@ -141,7 +139,7 @@ const CustomDrawer = () => {
           title=""
           style={{ backgroundColor: "#fff" }}
         >
-          {myTags.current
+          {tags
             .filter((item1: any) => {
               return item1.father == "null";
             })
@@ -166,7 +164,7 @@ const CustomDrawer = () => {
                   />
                 )}
               >
-                {myTags.current
+                {tags
                   .filter((item3: any) => {
                     return item3.father == item2.id;
                   })

@@ -20,20 +20,18 @@ import * as Crypto from "expo-crypto";
 import dayjs from "dayjs";
 import { useSqlite } from "@/providers/SqliteProvider";
 import { Divider } from "react-native-paper";
-import { useData } from "@/providers/DataProvider";
 import { windowHeight, windowWidth } from "@/constants/Dimensions";
 
 export default forwardRef(({ props }: any, ref: any) => {
   const [textInput, setTextInput] = useState<string | undefined>("");
   const [tagInput, setTagInput] = useState<string | undefined>("");
-  const { exeSql } = useSqlite();
+  const { exeSql, db } = useSqlite();
   const [isShowTagsPop, setIsShowTagsPop] = useState<boolean>(false);
   const [selectedTag, setSelectedTag] = useState<string>("");
   // 获取父组件传递的值与方法
   const inputRef: any = useRef(null);
   const inputTagRef: any = useRef(null);
-  const { toggleModal, isModalVisible, getData, id } = props;
-  const { myTags } = useData();
+  const { toggleModal, isModalVisible, getData, id, tags } = props;
 
   // 向外导出的函数
   useImperativeHandle(ref, () => ({
@@ -89,45 +87,119 @@ export default forwardRef(({ props }: any, ref: any) => {
   // 创建灵感
   const create = async () => {
     try {
-      const id = Crypto.randomUUID();
+      const notion_id = Crypto.randomUUID();
+      const tag_id = Crypto.randomUUID();
       const create_time: any = dayjs().valueOf();
-      const updata_time: any = create_time;
+      const update_time: any = create_time;
 
-      exeSql("searchTagIdByName", [tagInput]).then(res => {
-        if (res.length == 0) {
-          const newTagId = Crypto.randomUUID();
-          exeSql("insertTag", [
-            newTagId,
-            tagInput,
-            "null",
+      // 查找标签id
+      // const searchTagIdByNamePromise = exeSql("searchTagIdByName", [tagInput]);
+      // const [searchTagIdByNameRes] = await Promise.all([
+      //   searchTagIdByNamePromise,
+      // ]);
+      // console.log("searchTagIdByNameRes", searchTagIdByNameRes);
+
+      // const insertTagPromise = exeSql("insertTag", [
+      //   tag_id,
+      //   tagInput,
+      //   "null",
+      //   dayjs().valueOf(),
+      //   dayjs().valueOf(),
+      // ]);
+
+      // const insertNotionPromise = exeSql("insertNotion", [
+      //   notion_id,
+      //   textInput,
+      //   searchTagIdByNameRes[0]?.id || tag_id,
+      //   dayjs().valueOf(),
+      //   dayjs().valueOf(),
+      // ]);
+
+      // if (searchTagIdByNameRes.length == 0) {
+      //   console.log("No tags found");
+      //   const [insertTagPromiseRes] = await Promise.all([insertTagPromise]);
+      //   const [insertNotionPromiseRes] = await Promise.all([
+      //     insertNotionPromise,
+      //   ]);
+      //   console.log("insertNotionPromiseRes", insertNotionPromiseRes);
+      // } else {
+      //   console.log("tag found");
+      //   const [insertNotionPromiseRes] = await Promise.all([
+      //     insertNotionPromise,
+      //   ]);
+      //   console.log("insertNotionPromiseRes", insertNotionPromiseRes);
+      // }
+
+      // 测试
+      // const readOnly = false;
+      // await db?.current.transactionAsync(async (tx: any) => {
+      //   const result = await tx.executeSqlAsync(
+      //     // "SELECT COUNT(*) FROM notions",
+      //     "SELECT * FROM notions",
+      //     [],
+      //   );
+      //   // tx.executeSqlAsync("COMMIT");
+      //   console.log("查询:", result);
+      // }, readOnly);
+
+      // await db?.current.transactionAsync(async (tx: any) => {
+      //   const result = await tx.executeSqlAsync(
+      //     // "SELECT COUNT(*) FROM notions",
+      //     "INSERT INTO notions (id,content,tag,create_time,update_time) VALUES (?, ?, ?, ?,?)",
+      //     [Crypto.randomUUID(), "你好", "dadada", create_time, update_time],
+      //   );
+      //   console.log("插入:", result);
+      // }, readOnly);
+
+      // const [insertNotionRes] = await Promise.all([
+      //   exeSql("insertNotion", [
+      //     notion_id,
+      //     textInput,
+      //     tag_id,
+      //     dayjs().valueOf(),
+      //     dayjs().valueOf(),
+      //   ]),
+      // ]);
+
+      await exeSql("searchTagIdByName", [tagInput]).then(async res => {
+        console.log("------------------------------------------------");
+        console.log(res.rows.length);
+
+        if (res.rows.length > 0) {
+          await exeSql("insertNotion", [
+            Crypto.randomUUID(),
+            textInput,
+            res.rows[0]?.id,
+            // "id",
             create_time,
-            updata_time,
-          ]).then(res => {
-            exeSql("insertNotion", [
-              id,
-              textInput,
-              newTagId,
-              create_time,
-              updata_time,
-            ]).then(() => {
-              toggleModal();
-              getData();
-              setTextInput("");
-            });
+            update_time,
+          ]).then(() => {
+            toggleModal();
+            getData();
+            setTextInput("");
           });
         }
-        exeSql("insertNotion", [
-          id,
-          textInput,
-          res[0]?.id,
+        await exeSql("insertTag", [
+          Crypto.randomUUID(),
+          tagInput,
+          "",
           create_time,
-          updata_time,
-        ]).then(() => {
-          toggleModal();
-          getData();
-          setTextInput("");
+          update_time,
+        ]).then(async res1 => {
+          await exeSql("insertNotion", [
+            Crypto.randomUUID(),
+            textInput,
+            res.rows[0].id,
+            create_time,
+            update_time,
+          ]).then(() => {
+            toggleModal();
+            getData();
+            setTextInput("");
+          });
         });
       });
+      console.log("Insert");
     } catch (error) {
       throw error;
     }
@@ -138,15 +210,14 @@ export default forwardRef(({ props }: any, ref: any) => {
     return (
       <View style={styles.tagModal}>
         {isShowTagsPop &&
-          myTags?.current
+          tags
             ?.filter((tagItem: any) =>
               tagItem.name.toLowerCase().includes(tagInput),
             )
             .map((tagItem: any) => {
               let father_name: string = tagItem?.father
-                ? (myTags?.current.find(
-                    (item: any) => item.id === tagItem?.father,
-                  )?.name || "") + "/"
+                ? (tags?.find((item: any) => item.id === tagItem?.father)
+                    ?.name || "") + "/"
                 : "";
               // 如果father_name为/（表示没有father），则重新赋值为空
               father_name = father_name === "/" ? "" : father_name;
