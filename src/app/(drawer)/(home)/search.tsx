@@ -1,16 +1,14 @@
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import React, { useState, useRef } from "react";
-import { Link, Stack, router } from "expo-router";
+import { Stack } from "expo-router";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { FontSize, defalutSize } from "@/constants/Size";
-import Colors from "@/constants/Colors";
-import { windowWidth } from "@/constants/Dimensions";
+import { Colors, FontSize, defalutSize, Dimensions } from "@/constants";
 import { Checkbox } from "react-native-paper";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function SearchScreen() {
@@ -142,7 +140,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#f2f4f3",
     alignItems: "center",
-    width: windowWidth - 120,
+    width: Dimensions.windowWidth - 120,
     paddingHorizontal: defalutSize,
     paddingVertical: defalutSize * 0.7,
     borderRadius: defalutSize * 2,
@@ -154,7 +152,7 @@ const styles = StyleSheet.create({
     color: Colors.light.other,
   },
   input: {
-    width: windowWidth - 80,
+    width: Dimensions.windowWidth - 80,
     fontSize: FontSize.s,
     marginLeft: defalutSize * 0.5,
     color: Colors.light.other,

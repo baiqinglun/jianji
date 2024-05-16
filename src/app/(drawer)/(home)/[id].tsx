@@ -1,24 +1,12 @@
-import { useEffect, useState, useMemo, useRef } from "react";
-import {
-  TextInput,
-  Pressable,
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  Alert,
-  Button,
-  LogBox,
-} from "react-native";
-import { Stack, Link, router } from "expo-router";
+import { useEffect, useState, useRef } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { Stack, router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import Colors from "@/constants/Colors";
-import { FontSize, defalutSize } from "@/constants/Size";
 import { useLocalSearchParams } from "expo-router";
 import { Dialog } from "@rneui/themed";
-import CreateNotionModal from "@/components/CreateNotionModal";
+import { Colors, defalutSize, FontSize } from "@/constants";
+import { CreateNotionModal } from "@/components";
 import { useSqlite } from "@/providers/SqliteProvider";
-// import { exeSelectById } from '@/libs/Sqlite';
 
 const IdScreen = () => {
   const { id }: any = useLocalSearchParams();

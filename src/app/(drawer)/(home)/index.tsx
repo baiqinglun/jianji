@@ -2,15 +2,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, View, StyleSheet, FlatList, Modal } from "react-native";
 import { Stack, Link, Navigator, useFocusEffect } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import Colors from "@/constants/Colors";
-import { FontSize, defalutSize } from "@/constants/Size";
-import CartItem from "@/components/CartItem";
-import CreateNotionModal from "@/components/CreateNotionModal";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
 import styles from "./index.styles";
-import { db, exeSql, getDbFile } from "@/libs/Sqlite";
+import { CartItem, CreateNotionModal } from "@/components";
+import { defalutSize, Colors } from "@/constants";
+import { db, exeSql, getDbFile } from "@/libs";
 
 function HomeScreen() {
   const notionModalRef: any = useRef(null);
@@ -31,7 +29,7 @@ function HomeScreen() {
   );
 
   useEffect(() => {
-    // getDbFile();
+    getDbFile();
     getData();
   }, []);
 

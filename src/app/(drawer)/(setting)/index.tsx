@@ -1,10 +1,10 @@
-import { View, Text, FlatList, Pressable } from "react-native";
+import { View, FlatList, Pressable } from "react-native";
 import React from "react";
-import { Link, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
-import { settings } from "@/constants/settings";
-import SettingCartItem from "@/components/settingCartItem";
+import { Settings } from "@/constants";
+import { SettingCartItem } from "@/components";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 
 const Index = () => {
@@ -33,7 +33,7 @@ const Index = () => {
 
       {/* 内容 */}
       <FlatList
-        data={settings}
+        data={Settings}
         renderItem={item => <SettingCartItem {...item} />}
       />
     </View>

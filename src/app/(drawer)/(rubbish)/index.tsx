@@ -1,14 +1,12 @@
 import { View, Text, Pressable, StyleSheet, FlatList } from "react-native";
 import React, { useState } from "react";
-import { Link, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
-import Colors from "@/constants/Colors";
 import { Checkbox } from "react-native-paper";
-import { FontSize, defalutSize } from "@/constants/Size";
-import CartItem from "@/components/CartItem";
+import { FontSize, defalutSize, Colors } from "@/constants";
+import { CartItem, Dialog } from "@/components";
 import notions from "@assetsdata/notions";
-import MyDialog from "@/components/Dialog";
 
 const Index = () => {
   const navigation = useNavigation();
@@ -86,7 +84,7 @@ const Index = () => {
       />
 
       {/* 弹窗 */}
-      <MyDialog
+      <Dialog
         content="是否全部删除"
         visible={isDelete}
         onConfirmClick={deleteSelect}

@@ -1,7 +1,5 @@
 import { StyleSheet } from "react-native";
-import { FontSize, defalutSize } from "@/constants/Size";
-import Colors from "@/constants/Colors";
-import { windowHeight, windowWidth } from "@/constants/Dimensions";
+import { Colors, FontSize, defalutSize, Dimensions } from "@/constants";
 
 const styles = StyleSheet.create({
   centeredView: {
@@ -13,8 +11,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 5,
     paddingLeft: 5,
-    height: windowHeight * 0.5,
-    width: windowWidth * 0.8,
+    height: Dimensions.windowHeight * 0.5,
+    width: Dimensions.windowWidth * 0.8,
     elevation: 2,
   },
   tagInputContainer: {
@@ -55,8 +53,8 @@ const styles = StyleSheet.create({
   tagModal: {
     position: "absolute",
     top: 0,
-    left: windowWidth * 0.2,
-    width: windowWidth * 0.4,
+    left: Dimensions.windowWidth * 0.2,
+    width: Dimensions.windowWidth * 0.4,
     backgroundColor: Colors.light.tagBg,
     gap: defalutSize * 0.5,
   },

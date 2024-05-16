@@ -1,7 +1,7 @@
 import { Text } from "react-native";
 import React from "react";
 import { Portal, Dialog, Button } from "react-native-paper";
-import Colors from "@/constants/Colors";
+import { Colors } from "@/constants";
 import styles from "./Dialog.styles";
 
 export type MyDialog = {

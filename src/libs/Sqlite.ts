@@ -41,20 +41,6 @@ const getDbFile = async () => {
 };
 
 const exeSql = async (type: string, data: any[]) => {
-  // try {
-  //   const readOnly = false;
-
-  //   return db
-  //     ?.execAsync([{ sql: sqls[type], args: data }], readOnly)
-  //     .then((result: any) => {
-  //       const data = result[0]?.rows;
-  //       console.log("执行结果", data);
-  //       return data;
-  //     });
-  // } catch (error) {
-  //   console.error("An error occurred:", error);
-  //   throw error;
-  // }
   return new Promise((resolve, reject) => {
     try {
       const readOnly = false;
@@ -76,4 +62,6 @@ const exeSql = async (type: string, data: any[]) => {
   });
 };
 
-export { db, getDbFile, exeSql };
+const MySqlite = { db, getDbFile, exeSql };
+
+export default MySqlite;

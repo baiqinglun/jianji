@@ -8,14 +8,13 @@ import { Tooltip } from "@rneui/themed";
 import relativeTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
 
-import MyDialog from "./Dialog";
-import Colors from "@/constants/Colors";
-import { FontSize, defalutSize } from "@/constants/Size";
+import { Colors } from "@/constants";
+import { Dialog } from "@/components";
 import styles from "./CartItem.styles";
 
 dayjs.extend(relativeTime);
 
-function CartItem({ notion, cartType, func }: any) {
+const CartItem = ({ notion, cartType, func }: any) => {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [openList, setOpenList] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -145,7 +144,7 @@ function CartItem({ notion, cartType, func }: any) {
         </Link>
 
         {/* 是否删除弹窗 */}
-        <MyDialog
+        <Dialog
           content={notion.content}
           visible={deleteVisible}
           onConfirmClick={toggleDialog}
@@ -155,6 +154,6 @@ function CartItem({ notion, cartType, func }: any) {
       </View>
     </>
   );
-}
+};
 
 export default CartItem;

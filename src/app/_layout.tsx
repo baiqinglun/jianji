@@ -1,20 +1,11 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { PaperProvider } from "react-native-paper";
-import { useColorScheme } from "@/components/useColorScheme";
 import { LogBox } from "react-native";
-import SqliteProvider, { useSqlite } from "@/providers/SqliteProvider";
-import * as Crypto from "expo-crypto";
-import dayjs from "dayjs";
-
+import SqliteProvider from "@/providers/SqliteProvider";
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -57,20 +48,16 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
   return (
     <PaperProvider>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <SqliteProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen
-              name="(drawer)"
-              options={{ headerShown: false }}
-            />
-          </Stack>
-        </SqliteProvider>
-      </ThemeProvider>
+      <SqliteProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen
+            name="(drawer)"
+            options={{ headerShown: false }}
+          />
+        </Stack>
+      </SqliteProvider>
     </PaperProvider>
   );
 }

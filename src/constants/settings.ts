@@ -1,6 +1,6 @@
 import { avaterImage } from "./Images";
 
-export const settings = [
+const Settings = [
   {
     name: "修改昵称",
     text: "bql",
@@ -47,3 +47,5 @@ export const settings = [
     image: "",
   },
 ];
+
+export default Settings;

@@ -11,15 +11,14 @@ import { View, Text, TextInput, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Crypto from "expo-crypto";
 import dayjs from "dayjs";
-import { exeSql } from "@/libs/Sqlite";
 import { Divider } from "react-native-paper";
 
 // 自定义库
-import { pasteFromClipboard } from "@/libs/Clipboard";
-import Colors from "@/constants/Colors";
+import { pasteFromClipboard, exeSql } from "@/libs";
+import { Colors } from "@/constants";
 import styles from "./CreateNotionModal.styles";
 
-export default forwardRef(({ props }: any, ref: any) => {
+const CreateNotionModal = forwardRef(({ props }: any, ref: any) => {
   const [textInput, setTextInput] = useState<string>("");
   const [tagInput, setTagInput] = useState<string>("");
   const [isShowTagsPop, setIsShowTagsPop] = useState<boolean>(false);
@@ -315,3 +314,5 @@ export default forwardRef(({ props }: any, ref: any) => {
     </>
   );
 });
+
+export default CreateNotionModal;

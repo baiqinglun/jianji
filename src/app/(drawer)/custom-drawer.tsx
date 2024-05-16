@@ -1,36 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  FlatList,
-  ScrollView,
-} from "react-native";
-import { Link, useFocusEffect } from "expo-router";
+import { useEffect, useState } from "react";
+import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
+import { Link } from "expo-router";
 import { List } from "react-native-paper";
 import { MaterialIcons } from "@expo/vector-icons";
-import DivideLine from "@/components/DivideLine";
-import Colors from "@/constants/Colors";
-import { avaterImage } from "@/constants/Images";
-import { FontSize, defalutSize } from "@/constants/Size";
-import { tags } from "@assets/data/tags";
-import { noteList } from "@assetsdata/noteList";
+import { noteList } from "@assets/data/noteList";
+import { DivideLine } from "@/components";
+import { FontSize, defalutSize, Colors, Images } from "@/constants";
 import { useSqlite } from "@/providers/SqliteProvider";
-import { DrawerActions } from "@react-navigation/native";
 
 const CustomDrawer = () => {
   const [renameModal, setRenameModal] = useState<boolean>(false);
   const { exeSql } = useSqlite();
   const [tags, setTags] = useState([]);
-  //  useFocusEffect(
-  //   useCallback(() => {
-  //     getData()
-  //     return () => {
-  //       // 离开时发生的事件
-  //     }
-  //   }, [])
-  // );
 
   useEffect(() => {
     getData();
@@ -50,7 +31,7 @@ const CustomDrawer = () => {
             {/* <Image style={styles.avater} source={require("../../../assets/images/avater.jpg")}/> */}
             <Image
               style={styles.avater}
-              source={avaterImage}
+              source={Images.avaterImage}
             />
             <Text style={styles.username}>用户名</Text>
           </View>
