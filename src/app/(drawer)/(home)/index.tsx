@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Pressable, View, StyleSheet, FlatList, Modal } from "react-native";
-import { Stack, Link, Navigator, useFocusEffect } from "expo-router";
+import { Pressable, View, FlatList, Modal } from "react-native";
+import { Stack, Link, useFocusEffect } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
@@ -8,7 +8,7 @@ import { ActivityIndicator } from "react-native-paper";
 import styles from "./index.styles";
 import { CartItem, CreateNotionModal } from "@/components";
 import { defalutSize, Colors } from "@/constants";
-import { db, exeSql, getDbFile } from "@/libs";
+import { exeSql } from "@/libs";
 
 function HomeScreen() {
   const notionModalRef: any = useRef(null);
