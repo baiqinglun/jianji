@@ -53,7 +53,6 @@ export default function SearchScreen() {
 
   // 搜索
   const search = () => {
-    console.log(searchText);
     setSearchText("");
   };
 

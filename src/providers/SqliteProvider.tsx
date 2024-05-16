@@ -70,8 +70,6 @@ const SqliteProvider = ({ children }: PropsWithChildren) => {
   };
 
   const exeSql = async (type: string, data: any[]) => {
-    console.log(data);
-
     try {
       if (db == null) {
         console.log("数据库不存在");

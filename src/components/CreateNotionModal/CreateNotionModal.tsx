@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Crypto from "expo-crypto";
 import dayjs from "dayjs";
 import { Divider } from "react-native-paper";
+import * as SQLite from "expo-sqlite";
 
 // 自定义库
 import { pasteFromClipboard, exeSql } from "@/libs";
@@ -22,11 +23,12 @@ const CreateNotionModal = forwardRef(({ props }: any, ref: any) => {
   const [textInput, setTextInput] = useState<string>("");
   const [tagInput, setTagInput] = useState<string>("");
   const [isShowTagsPop, setIsShowTagsPop] = useState<boolean>(false);
-  const [selectedTag, setSelectedTag] = useState<string>("");
   // 获取父组件传递的值与方法
   const inputRef: any = useRef(null);
   const inputTagRef: any = useRef(null);
-  const { toggleModal, isModalVisible, getData, id, tags } = props;
+  const { toggleModal, id, tags, setIsHomeFocus } = props;
+
+  const db = SQLite.openDatabase("mydata.db");
 
   // 向外导出的函数
   useImperativeHandle(ref, () => ({
@@ -50,114 +52,105 @@ const CreateNotionModal = forwardRef(({ props }: any, ref: any) => {
   // 选择标签后
   const selectTag = (tagid: string, tagname: string) => {
     console.log(tagname);
-    setSelectedTag(tagid);
     setIsShowTagsPop(false);
     setTagInput(tagname);
   };
 
   // 切换模态框
-  const inputOnFocus = () => {
-    console.log(111);
-  };
+  const inputOnFocus = () => {};
 
   // 更新数据
   const updata = async () => {
-    try {
-      exeSql("searchNotionById", [id]).then((res: any) => {
-        if (res[0]["content"] == textInput) {
-          toggleModal();
-          return;
-        }
-        const updata_time = dayjs().valueOf();
-        exeSql("updateNotionById", [textInput, updata_time, id]).then(() => {
-          console.log("更新数据成功");
-        });
+    exeSql("searchNotionById", [id]).then((res: any) => {
+      if (res[0]["content"] === textInput) {
         toggleModal();
+        return;
+      }
+      const updata_time = dayjs().valueOf();
+      exeSql("updateNotionById", [textInput, updata_time, id]).then(() => {
+        console.log("更新数据成功");
       });
-    } catch (error) {
-      throw error;
-    }
+      toggleModal();
+    });
   };
 
   // 创建灵感
   const create = async () => {
-    try {
-      const notion_id = Crypto.randomUUID();
-      const tag_id = Crypto.randomUUID();
-      const create_time: any = dayjs().valueOf();
-      const update_time: any = create_time;
+    const notion_id = Crypto.randomUUID();
+    const tag_id = Crypto.randomUUID();
+    const create_time: any = dayjs().valueOf();
+    const update_time: any = create_time;
+    const readOnly = false;
 
-      const tagId: any = await exeSql("searchTagIdByName", [tagInput]);
-      if (tagId.length > 0) {
-        // 标签已存在，直接插入灵感
-        await insertNotion(
-          notion_id,
-          textInput,
-          tagId[0].id,
-          create_time,
-          update_time,
-        );
-      } else {
-        // 标签不存在，先插入标签，再插入灵感
-        const newTagId = await insertTag(
-          tag_id,
-          tagInput,
-          "",
-          create_time,
-          update_time,
-        );
-        await insertNotion(
-          notion_id,
-          textInput,
-          newTagId,
-          create_time,
-          update_time,
-        );
-      }
+    console.log("开始执行");
+    await db
+      .execAsync(
+        [{ sql: "SELECT id FROM tags WHERE name = ?", args: [tagInput] }],
+        readOnly,
+      )
+      .then((result: any) => {
+        const rows = result[0]?.rows;
+        if (rows.length > 0) {
+          // 标签已存在
+          db.execAsync(
+            [
+              {
+                sql: "INSERT INTO notions (id,content,tag,create_time,update_time) VALUES (?, ?, ?, ?,?)",
+                args: [
+                  notion_id,
+                  textInput,
+                  rows[0].id,
+                  create_time,
+                  update_time,
+                ],
+              },
+            ],
+            readOnly,
+          ).then((result: any) => {
+            console.log("插入notion成功", result);
+          });
+        } else {
+          // 标签不存在
+          db.execAsync(
+            [
+              {
+                sql: "INSERT INTO tags (id,name,father,create_time,update_time) VALUES (?, ?, ?, ?,?)",
+                args: [tag_id, tagInput, "null", create_time, update_time],
+              },
+            ],
+            readOnly,
+          ).then((insertTagRes: any) => {
+            db.execAsync(
+              [
+                {
+                  sql: "INSERT INTO notions (id,content,tag,create_time,update_time) VALUES (?, ?, ?, ?,?)",
+                  args: [
+                    notion_id,
+                    textInput,
+                    tag_id,
+                    create_time,
+                    update_time,
+                  ],
+                },
+              ],
+              readOnly,
+            ).then((result: any) => {
+              console.log("插入notion成功", result);
+            });
+          });
+        }
+      })
+      .catch((error: any) => {
+        console.error("An error occurred:", error);
+      });
+    console.log("执行完毕");
 
-      // 执行成功后的操作
-      toggleModal();
-      getData();
-      setTextInput("");
-    } catch (error) {
-      throw error;
-    }
+    // 执行成功后的操作
+    toggleModal();
+    // getData();
+    setIsHomeFocus(true);
+    setTextInput("");
   };
-
-  // 插入标签
-  async function insertTag(
-    tag_id: string,
-    tagInput: string,
-    father: string,
-    create_time: any,
-    update_time: any,
-  ) {
-    const res: any = await exeSql("insertTag", [
-      tag_id,
-      tagInput,
-      father,
-      create_time,
-      update_time,
-    ]);
-    return res[0].id;
-  }
-
-  // 插入灵感
-  async function insertNotion(
-    notion_id: string,
-    textInput: string,
-    tagId: string,
-    create_time: any,
-    update_time: any,
-  ) {
-    await exeSql("insertNotion", [
-      notion_id,
-      textInput,
-      tagId,
-      create_time,
-      update_time,
-    ]);
-  }
 
   // 渲染标签列表弹窗
   const renderTagPopItem = () => {
@@ -201,7 +194,6 @@ const CreateNotionModal = forwardRef(({ props }: any, ref: any) => {
             <Pressable
               style={styles.tagIcon}
               onPress={() => {
-                console.log(555);
                 setIsShowTagsPop(!isShowTagsPop);
               }}
             >
@@ -262,14 +254,14 @@ const CreateNotionModal = forwardRef(({ props }: any, ref: any) => {
               }}
             >
               {/* <Pressable onPress={()=>{} }> */}
-              {({}) => <Text style={styles.cancel}>取消</Text>}
+              {() => <Text style={styles.cancel}>取消</Text>}
             </Pressable>
             <Pressable
               onPress={() => {
                 setTextInput("");
               }}
             >
-              {({}) => <Text style={styles.cancel}>清空</Text>}
+              {() => <Text style={styles.cancel}>清空</Text>}
             </Pressable>
             <Pressable
               onPress={async () => {
@@ -293,7 +285,11 @@ const CreateNotionModal = forwardRef(({ props }: any, ref: any) => {
 
             <Pressable
               onPress={() => {
-                id ? updata() : create();
+                if (id) {
+                  updata();
+                } else {
+                  create();
+                }
               }}
             >
               {({ pressed }) => (

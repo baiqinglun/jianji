@@ -17,9 +17,7 @@ const CustomDrawer = () => {
     getData();
   }, []);
 
-  const getData = async () => {
-    console.log(1, tags);
-  };
+  const getData = async () => {};
 
   const tagRename = () => {};
   return (
@@ -130,9 +128,7 @@ const CustomDrawer = () => {
                 onPress={() => {
                   tagRename();
                 }}
-                onLongPress={() => {
-                  console.log(1);
-                }}
+                onLongPress={() => {}}
                 descriptionStyle={{ backgroundColor: "red" }}
                 rippleColor={Colors.light.tagBg}
                 titleStyle={{ color: Colors.light.defalutText }}

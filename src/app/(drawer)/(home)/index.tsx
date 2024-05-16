@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Pressable, View, FlatList, Modal } from "react-native";
+import { Pressable, View, FlatList, Modal, RefreshControl } from "react-native";
 import { Stack, Link, useFocusEffect } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -8,7 +8,7 @@ import { ActivityIndicator } from "react-native-paper";
 import styles from "./index.styles";
 import { CartItem, CreateNotionModal } from "@/components";
 import { defalutSize, Colors } from "@/constants";
-import { exeSql } from "@/libs";
+import * as SQLite from "expo-sqlite";
 
 function HomeScreen() {
   const notionModalRef: any = useRef(null);
@@ -17,19 +17,10 @@ function HomeScreen() {
   const navigation = useNavigation();
   const [notions, setNotions] = useState([]);
   const [tags, setTags] = useState([]);
-
-  // 页面聚焦时事件
-  useFocusEffect(
-    useCallback(() => {
-      getData();
-      return () => {
-        // 离开时发生的事件
-      };
-    }, []),
-  );
+  const [refreshing, setRefreshing] = useState(false);
+  const db = SQLite.openDatabase("mydata.db");
 
   useEffect(() => {
-    // getDbFile();
     getData();
   }, []);
 
@@ -49,36 +40,40 @@ function HomeScreen() {
   // 先全部获取异步数据，然后再赋值
   const getData = async () => {
     setIsLodingData(true); // 设置加载状态为 true
-    exeSql("searchAllNotions", [])
-      .then(
-        async (res: any) => {
-          console.log(res);
-          for (let i = 0; i < res.length; i++) {
-            await exeSql("searchTagNameById", [res[i].tag]).then(
-              (res2: any) => {
-                res[i].tag = res2[0].name;
-              },
-            );
-          }
-          setNotions(res);
-        },
-        () => {},
-      )
-      .catch(error => {
-        console.error("Error occurred:", error);
-      })
-      .finally(() => {});
 
-    await exeSql("searchAllTags", [])
-      .then(
-        async (res: any) => {
-          setTags(res);
-        },
-        () => {},
-      )
-      .finally(() => {});
+    const readOnly = false;
+    await db
+      .execAsync([{ sql: "SELECT * FROM notions", args: [] }], readOnly)
+      .then(async (result: any) => {
+        for (let i = 0; i < result[0].rows.length; i++) {
+          await db
+            .execAsync(
+              [
+                {
+                  sql: "SELECT name FROM tags WHERE id = ?",
+                  args: [result[0].rows[i].tag],
+                },
+              ],
+              readOnly,
+            )
+            .then((find_res: any) => {
+              result[0].rows[i].tag = find_res[0].rows[0]?.name;
+            });
+        }
+        setNotions(result[0].rows);
+      });
+
+    await db
+      .execAsync([{ sql: "SELECT * FROM tags", args: [] }], readOnly)
+      .then((result: any) => {
+        setTags(result[0].rows);
+      });
 
     setIsLodingData(false);
+  };
+
+  const onRefresh = () => {
+    getData();
   };
 
   return (
@@ -145,6 +140,12 @@ function HomeScreen() {
             gap: defalutSize,
             padding: defalutSize * 0.5,
           }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />
+          }
         />
       )}
 
