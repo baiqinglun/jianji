@@ -9,7 +9,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
 
 import { Colors } from "@/constants";
-import { Dialog } from "@/components";
+import { Dialog } from "@/components/Dialog";
 import styles from "./CartItem.styles";
 
 dayjs.extend(relativeTime);

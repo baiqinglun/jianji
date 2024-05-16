@@ -29,7 +29,7 @@ function HomeScreen() {
   );
 
   useEffect(() => {
-    getDbFile();
+    // getDbFile();
     getData();
   }, []);
 
