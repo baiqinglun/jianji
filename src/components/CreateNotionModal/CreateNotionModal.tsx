@@ -12,12 +12,12 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Crypto from "expo-crypto";
 import dayjs from "dayjs";
 import { Divider } from "react-native-paper";
-import * as SQLite from "expo-sqlite";
 
 // 自定义库
-import { pasteFromClipboard, exeSql } from "@/libs";
+import { pasteFromClipboard } from "@/libs";
 import { Colors } from "@/constants";
 import styles from "./CreateNotionModal.styles";
+import { useSqlite } from "@/providers/SqliteProvider";
 
 const CreateNotionModal = forwardRef(({ props }: any, ref: any) => {
   const [textInput, setTextInput] = useState<string>("");
@@ -26,19 +26,18 @@ const CreateNotionModal = forwardRef(({ props }: any, ref: any) => {
   // 获取父组件传递的值与方法
   const inputRef: any = useRef(null);
   const inputTagRef: any = useRef(null);
-  const { toggleModal, id, tags, setIsHomeFocus } = props;
-
-  const db = SQLite.openDatabase("mydata.db");
+  const { toggleModal, id, tags } = props;
+  const { exeSql } = useSqlite();
 
   // 向外导出的函数
   useImperativeHandle(ref, () => ({
     inputOnFocus,
     setTextInput,
+    setTagInput,
   }));
 
   // 显示标签弹窗
   const showTagsPop = () => {
-    console.log("show");
     setIsShowTagsPop(true);
   };
 
@@ -80,75 +79,44 @@ const CreateNotionModal = forwardRef(({ props }: any, ref: any) => {
     const tag_id = Crypto.randomUUID();
     const create_time: any = dayjs().valueOf();
     const update_time: any = create_time;
-    const readOnly = false;
 
-    console.log("开始执行");
-    await db
-      .execAsync(
-        [{ sql: "SELECT id FROM tags WHERE name = ?", args: [tagInput] }],
-        readOnly,
-      )
-      .then((result: any) => {
-        const rows = result[0]?.rows;
+    await exeSql("searchTagIdByName", [tagInput]).then(
+      (searchTagIdByNameRes: any) => {
+        const rows = searchTagIdByNameRes[0].rows;
         if (rows.length > 0) {
-          // 标签已存在
-          db.execAsync(
-            [
-              {
-                sql: "INSERT INTO notions (id,content,tag,create_time,update_time) VALUES (?, ?, ?, ?,?)",
-                args: [
-                  notion_id,
-                  textInput,
-                  rows[0].id,
-                  create_time,
-                  update_time,
-                ],
-              },
-            ],
-            readOnly,
-          ).then((result: any) => {
-            console.log("插入notion成功", result);
+          exeSql("insertNotion", [
+            notion_id,
+            textInput,
+            rows[0].id,
+            create_time,
+            update_time,
+          ]).then(() => {
+            console.log("插入notion成功");
           });
         } else {
-          // 标签不存在
-          db.execAsync(
-            [
-              {
-                sql: "INSERT INTO tags (id,name,father,create_time,update_time) VALUES (?, ?, ?, ?,?)",
-                args: [tag_id, tagInput, "null", create_time, update_time],
-              },
-            ],
-            readOnly,
-          ).then((insertTagRes: any) => {
-            db.execAsync(
-              [
-                {
-                  sql: "INSERT INTO notions (id,content,tag,create_time,update_time) VALUES (?, ?, ?, ?,?)",
-                  args: [
-                    notion_id,
-                    textInput,
-                    tag_id,
-                    create_time,
-                    update_time,
-                  ],
-                },
-              ],
-              readOnly,
-            ).then((result: any) => {
-              console.log("插入notion成功", result);
+          exeSql("insertTag", [
+            tag_id,
+            tagInput,
+            "null",
+            create_time,
+            update_time,
+          ]).then(insertTagRes => {
+            exeSql("insertNotion", [
+              notion_id,
+              textInput,
+              tag_id,
+              create_time,
+              update_time,
+            ]).then(() => {
+              console.log("插入notion成功");
             });
           });
         }
-      })
-      .catch((error: any) => {
-        console.error("An error occurred:", error);
-      });
-    console.log("执行完毕");
+      },
+    );
 
     // 执行成功后的操作
     toggleModal();
-    // getData();
-    setIsHomeFocus(true);
     setTextInput("");
   };
 

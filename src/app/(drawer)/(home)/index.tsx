@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, View, FlatList, Modal, RefreshControl } from "react-native";
-import { Stack, Link, useFocusEffect } from "expo-router";
+import { Stack, Link } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
@@ -8,7 +8,7 @@ import { ActivityIndicator } from "react-native-paper";
 import styles from "./index.styles";
 import { CartItem, CreateNotionModal } from "@/components";
 import { defalutSize, Colors } from "@/constants";
-import * as SQLite from "expo-sqlite";
+import { useSqlite } from "@/providers/SqliteProvider";
 
 function HomeScreen() {
   const notionModalRef: any = useRef(null);
@@ -18,9 +18,11 @@ function HomeScreen() {
   const [notions, setNotions] = useState([]);
   const [tags, setTags] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const db = SQLite.openDatabase("mydata.db");
+  const { exeSql, deleteDb, initDbFile } = useSqlite();
 
   useEffect(() => {
+    // deleteDb();
+    // initDbFile();
     getData();
   }, []);
 
@@ -41,33 +43,21 @@ function HomeScreen() {
   const getData = async () => {
     setIsLodingData(true); // 设置加载状态为 true
 
-    const readOnly = false;
-    await db
-      .execAsync([{ sql: "SELECT * FROM notions", args: [] }], readOnly)
-      .then(async (result: any) => {
-        for (let i = 0; i < result[0].rows.length; i++) {
-          await db
-            .execAsync(
-              [
-                {
-                  sql: "SELECT name FROM tags WHERE id = ?",
-                  args: [result[0].rows[i].tag],
-                },
-              ],
-              readOnly,
-            )
-            .then((find_res: any) => {
-              result[0].rows[i].tag = find_res[0].rows[0]?.name;
-            });
-        }
-        setNotions(result[0].rows);
-      });
+    await exeSql("searchAllNotions", []).then(async searchAllNotionsRes => {
+      for (let i = 0; i < searchAllNotionsRes[0].rows.length; i++) {
+        await exeSql("searchTagNameById", [
+          searchAllNotionsRes[0].rows[i].tag,
+        ]).then(searchTagNameByIdRes => {
+          searchAllNotionsRes[0].rows[i].tag =
+            searchTagNameByIdRes[0].rows[0]?.name;
+        });
+      }
+      setNotions(searchAllNotionsRes[0].rows);
+    });
 
-    await db
-      .execAsync([{ sql: "SELECT * FROM tags", args: [] }], readOnly)
-      .then((result: any) => {
-        setTags(result[0].rows);
-      });
+    await exeSql("searchAllTags", []).then(searchAllTagsRes => {
+      setTags(searchAllTagsRes[0].rows);
+    });
 
     setIsLodingData(false);
   };
