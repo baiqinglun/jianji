@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react";
-import { View, StyleSheet, Pressable, TextInput } from "react-native";
-import { Button, Text, Card, Avatar, Checkbox } from "react-native-paper";
-import { Link, useNavigation } from "expo-router";
-import MyDialog from "./Dialog";
+import { useState } from "react";
+import { View } from "react-native";
+import { Link } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import Colors from "@/constants/Colors";
-import { FontSize, defalutSize } from "@/constants/Size";
-import { Tooltip } from "@rneui/themed";
 
+import { Button, Text, Checkbox } from "react-native-paper";
+import { Tooltip } from "@rneui/themed";
 import relativeTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
+
+import MyDialog from "./Dialog";
+import Colors from "@/constants/Colors";
+import { FontSize, defalutSize } from "@/constants/Size";
+import styles from "./CartItem.styles";
 
 dayjs.extend(relativeTime);
 
@@ -154,49 +156,5 @@ function CartItem({ notion, cartType, func }: any) {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  title: {
-    textAlign: "center",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    width: "100%",
-    height: 150,
-    padding: defalutSize,
-    borderRadius: defalutSize * 0.5,
-  },
-  time: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: defalutSize,
-  },
-  timeText: {
-    color: Colors.light.other,
-    fontSize: FontSize.s,
-    width: 310,
-  },
-  tag: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "auto",
-    gap: 5,
-    padding: 5,
-    color: Colors.light.tagText,
-    marginBottom: defalutSize,
-  },
-  tagText: {
-    backgroundColor: Colors.light.tagBg,
-    color: Colors.light.tagText,
-    padding: 2,
-  },
-  content: {
-    marginTop: 2,
-    color: Colors.light.defalutText,
-    fontSize: FontSize.m,
-    lineHeight: 32,
-  },
-});
 
 export default CartItem;

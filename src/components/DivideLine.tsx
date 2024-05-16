@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View } from "react-native";
 import React from "react";
-import { defalutSize } from "@/constants/Size";
-import Colors from "@/constants/Colors";
+import styles from "./DivideLine.styles";
 
 const DivideLine = ({ width, color }: any) => {
   return (
@@ -12,18 +11,5 @@ const DivideLine = ({ width, color }: any) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    margin: defalutSize * 2,
-  },
-  box: {
-    borderBottomWidth: 0.5,
-    alignSelf: "center",
-    marginHorizontal: "auto",
-    borderColor: Colors.light.other,
-    opacity: 0.5,
-  },
-});
 
 export default DivideLine;

@@ -1,31 +1,27 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Pressable,
-  ScrollView,
-} from "react-native";
+// 核心库
 import React, {
   forwardRef,
   useImperativeHandle,
   useRef,
   useState,
 } from "react";
-import { FontSize, defalutSize } from "@/constants/Size";
-import Colors from "@/constants/Colors";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { pasteFromClipboard } from "@/libs/Clipboard";
+import { View, Text, TextInput, Pressable } from "react-native";
+
+// 第三方库
+import { Ionicons } from "@expo/vector-icons";
 import * as Crypto from "expo-crypto";
 import dayjs from "dayjs";
-import { useSqlite } from "@/providers/SqliteProvider";
+import { exeSql } from "@/libs/Sqlite";
 import { Divider } from "react-native-paper";
-import { windowHeight, windowWidth } from "@/constants/Dimensions";
+
+// 自定义库
+import { pasteFromClipboard } from "@/libs/Clipboard";
+import Colors from "@/constants/Colors";
+import styles from "./CreateNotionModal.styles";
 
 export default forwardRef(({ props }: any, ref: any) => {
-  const [textInput, setTextInput] = useState<string | undefined>("");
-  const [tagInput, setTagInput] = useState<string | undefined>("");
-  const { exeSql, db } = useSqlite();
+  const [textInput, setTextInput] = useState<string>("");
+  const [tagInput, setTagInput] = useState<string>("");
   const [isShowTagsPop, setIsShowTagsPop] = useState<boolean>(false);
   const [selectedTag, setSelectedTag] = useState<string>("");
   // 获取父组件传递的值与方法
@@ -92,118 +88,77 @@ export default forwardRef(({ props }: any, ref: any) => {
       const create_time: any = dayjs().valueOf();
       const update_time: any = create_time;
 
-      // 查找标签id
-      // const searchTagIdByNamePromise = exeSql("searchTagIdByName", [tagInput]);
-      // const [searchTagIdByNameRes] = await Promise.all([
-      //   searchTagIdByNamePromise,
-      // ]);
-      // console.log("searchTagIdByNameRes", searchTagIdByNameRes);
-
-      // const insertTagPromise = exeSql("insertTag", [
-      //   tag_id,
-      //   tagInput,
-      //   "null",
-      //   dayjs().valueOf(),
-      //   dayjs().valueOf(),
-      // ]);
-
-      // const insertNotionPromise = exeSql("insertNotion", [
-      //   notion_id,
-      //   textInput,
-      //   searchTagIdByNameRes[0]?.id || tag_id,
-      //   dayjs().valueOf(),
-      //   dayjs().valueOf(),
-      // ]);
-
-      // if (searchTagIdByNameRes.length == 0) {
-      //   console.log("No tags found");
-      //   const [insertTagPromiseRes] = await Promise.all([insertTagPromise]);
-      //   const [insertNotionPromiseRes] = await Promise.all([
-      //     insertNotionPromise,
-      //   ]);
-      //   console.log("insertNotionPromiseRes", insertNotionPromiseRes);
-      // } else {
-      //   console.log("tag found");
-      //   const [insertNotionPromiseRes] = await Promise.all([
-      //     insertNotionPromise,
-      //   ]);
-      //   console.log("insertNotionPromiseRes", insertNotionPromiseRes);
-      // }
-
-      // 测试
-      // const readOnly = false;
-      // await db?.current.transactionAsync(async (tx: any) => {
-      //   const result = await tx.executeSqlAsync(
-      //     // "SELECT COUNT(*) FROM notions",
-      //     "SELECT * FROM notions",
-      //     [],
-      //   );
-      //   // tx.executeSqlAsync("COMMIT");
-      //   console.log("查询:", result);
-      // }, readOnly);
-
-      // await db?.current.transactionAsync(async (tx: any) => {
-      //   const result = await tx.executeSqlAsync(
-      //     // "SELECT COUNT(*) FROM notions",
-      //     "INSERT INTO notions (id,content,tag,create_time,update_time) VALUES (?, ?, ?, ?,?)",
-      //     [Crypto.randomUUID(), "你好", "dadada", create_time, update_time],
-      //   );
-      //   console.log("插入:", result);
-      // }, readOnly);
-
-      // const [insertNotionRes] = await Promise.all([
-      //   exeSql("insertNotion", [
-      //     notion_id,
-      //     textInput,
-      //     tag_id,
-      //     dayjs().valueOf(),
-      //     dayjs().valueOf(),
-      //   ]),
-      // ]);
-
-      await exeSql("searchTagIdByName", [tagInput]).then(async res => {
-        console.log("------------------------------------------------");
-        console.log(res.rows.length);
-
-        if (res.rows.length > 0) {
-          await exeSql("insertNotion", [
-            Crypto.randomUUID(),
-            textInput,
-            res.rows[0]?.id,
-            // "id",
-            create_time,
-            update_time,
-          ]).then(() => {
-            toggleModal();
-            getData();
-            setTextInput("");
-          });
-        }
-        await exeSql("insertTag", [
-          Crypto.randomUUID(),
+      const tagId: any = await exeSql("searchTagIdByName", [tagInput]);
+      if (tagId.length > 0) {
+        // 标签已存在，直接插入灵感
+        await insertNotion(
+          notion_id,
+          textInput,
+          tagId[0].id,
+          create_time,
+          update_time,
+        );
+      } else {
+        // 标签不存在，先插入标签，再插入灵感
+        const newTagId = await insertTag(
+          tag_id,
           tagInput,
           "",
           create_time,
           update_time,
-        ]).then(async res1 => {
-          await exeSql("insertNotion", [
-            Crypto.randomUUID(),
-            textInput,
-            res.rows[0].id,
-            create_time,
-            update_time,
-          ]).then(() => {
-            toggleModal();
-            getData();
-            setTextInput("");
-          });
-        });
-      });
-      console.log("Insert");
+        );
+        await insertNotion(
+          notion_id,
+          textInput,
+          newTagId,
+          create_time,
+          update_time,
+        );
+      }
+
+      // 执行成功后的操作
+      toggleModal();
+      getData();
+      setTextInput("");
     } catch (error) {
       throw error;
     }
   };
+
+  // 插入标签
+  async function insertTag(
+    tag_id: string,
+    tagInput: string,
+    father: string,
+    create_time: any,
+    update_time: any,
+  ) {
+    const res: any = await exeSql("insertTag", [
+      tag_id,
+      tagInput,
+      father,
+      create_time,
+      update_time,
+    ]);
+    return res[0].id;
+  }
+
+  // 插入灵感
+  async function insertNotion(
+    notion_id: string,
+    textInput: string,
+    tagId: string,
+    create_time: any,
+    update_time: any,
+  ) {
+    await exeSql("insertNotion", [
+      notion_id,
+      textInput,
+      tagId,
+      create_time,
+      update_time,
+    ]);
+  }
 
   // 渲染标签列表弹窗
   const renderTagPopItem = () => {
@@ -359,69 +314,4 @@ export default forwardRef(({ props }: any, ref: any) => {
       </View>
     </>
   );
-});
-
-const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignSelf: "center",
-  },
-  modalView: {
-    backgroundColor: "#fff",
-    borderRadius: 5,
-    paddingLeft: 5,
-    height: windowHeight * 0.5,
-    width: windowWidth * 0.8,
-    elevation: 2,
-  },
-  tagInputContainer: {
-    height: 40,
-  },
-  tagIcon: {
-    position: "absolute",
-    height: 30,
-    width: 30,
-    left: 5,
-    bottom: 5,
-  },
-  inputTags: {
-    flex: 1,
-    textAlign: "center",
-    paddingVertical: defalutSize,
-    fontSize: FontSize.m,
-  },
-  inputText: {
-    backgroundColor: "#fff",
-    height: 300,
-    textAlignVertical: "top",
-    padding: defalutSize,
-    fontSize: FontSize.m,
-  },
-  modalBtn: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingBottom: defalutSize,
-    marginTop: "auto",
-  },
-  cancel: {
-    color: Colors.light.tagText,
-    marginLeft: 10,
-    fontSize: FontSize.m,
-  },
-  tagModal: {
-    position: "absolute",
-    top: 0,
-    left: windowWidth * 0.2,
-    width: windowWidth * 0.4,
-    backgroundColor: Colors.light.tagBg,
-    gap: defalutSize * 0.5,
-  },
-  tagText: {
-    fontSize: FontSize.m,
-    color: Colors.light.tagText,
-    paddingVertical: defalutSize * 0.1,
-    paddingHorizontal: defalutSize * 0.4,
-  },
 });

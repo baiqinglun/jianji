@@ -1,12 +1,18 @@
 import { Asset } from "expo-asset";
-import { PropsWithChildren, createContext, useContext, useRef } from "react";
+import {
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 import * as FileSystem from "expo-file-system";
 import * as SQLite from "expo-sqlite";
 
 type SqliteType = {
   db: SQLite.SQLiteDatabase | null | any;
-  openDb: () => void;
-  getDbFile: () => void;
+  openDb: () => Promise<any>;
+  getDbFile: () => Promise<any>;
   exeSql: (type: string, data: any[]) => Promise<any>;
 };
 
@@ -27,18 +33,19 @@ const sqls: any = {
 
 const SqliteContext = createContext<SqliteType>({
   db: null,
-  openDb: () => {},
-  getDbFile: () => {},
+  openDb: async () => {},
+  getDbFile: async () => {},
   exeSql: async () => {},
 });
 
 const SqliteProvider = ({ children }: PropsWithChildren) => {
-  const db = useRef<null | SQLite.SQLiteDatabase>(null);
+  const [db, setDb] = useState<null | SQLite.SQLiteDatabase>(null);
 
   // 打开数据库
-  const openDb = () => {
+  const openDb = async () => {
     console.log("打开数据库");
-    db.current = SQLite.openDatabase("mydata.db", "3");
+    // db = SQLite.openDatabase("mydata.db", "3");
+    setDb(SQLite.openDatabase("mydata.db", "3"));
   };
 
   // 获取远程db数据
@@ -62,67 +69,26 @@ const SqliteProvider = ({ children }: PropsWithChildren) => {
     }
   };
 
-  // 执行语句
-  // const exeSql = async (type: string, data: any[]) => {
-  //   try {
-  //     if (db.current == null) {
-  //       console.log("数据库不存在");
-  //       openDb();
-  //     }
-  //     const readOnly = false;
-  //     return db?.current
-  //       ?.execAsync([{ sql: sqls[type], args: data }], readOnly)
-  //       .then((result: any) => {
-  //         const data = result[0]?.rows;
-  //         console.log("执行结果", result[0]?.rows);
-  //         return data;
-  //       });
-  //   } catch (error) {
-  //     console.error("An error occurred:", error);
-  //     throw error;
-  //   }
-  // };
-  // const exeSql = async (type: string, data: any[]) => {
-  //   try {
-  //     if (db.current == null) {
-  //       console.log("数据库不存在");
-  //       openDb();
-  //     }
-  //     const readOnly = false;
-  //     const result = await db?.current?.transactionAsync(async (tx: any) => {
-  //       return tx.executeSqlAsync(sqls[type], data).then((res: any) => {
-  //         console.log("数据1:", res);
-  //         return res;
-  //       });
-  //     });
-  //     console.log("result=", result);
-  //   } catch (error) {
-  //     console.error("An error occurred:", error);
-  //     throw error;
-  //   }
-  // };
-
   const exeSql = async (type: string, data: any[]) => {
     console.log(data);
 
     try {
-      if (db.current == null) {
+      if (db == null) {
         console.log("数据库不存在");
-        openDb();
+        await openDb();
       }
       const readOnly = false;
-      const result = await new Promise((resolve, reject) => {
-        db?.current?.transactionAsync(async (tx: any) => {
-          try {
-            const res = await tx.executeSqlAsync(sqls[type], data);
-            console.log("数据1:", res);
-            resolve(res);
-          } catch (error) {
-            reject(error);
-          }
-        });
+      const result = await db?.transactionAsync(async (tx: any) => {
+        try {
+          const res = await tx.executeSqlAsync(sqls[type], data);
+          console.log("result=", res);
+          return res;
+        } catch (error) {
+          // 事务执行出错，将会自动回滚
+          console.error("执行 SQL 出错：", error);
+          throw error;
+        }
       });
-      console.log("result=", result);
       return result;
     } catch (error) {
       console.error("An error occurred:", error);

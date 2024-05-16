@@ -8,10 +8,9 @@ import CartItem from "@/components/CartItem";
 import CreateNotionModal from "@/components/CreateNotionModal";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
-import { useSqlite } from "@/providers/SqliteProvider";
 import { ActivityIndicator } from "react-native-paper";
-import * as Crypto from "expo-crypto";
 import styles from "./index.styles";
+import { db, exeSql, getDbFile } from "@/libs/Sqlite";
 
 function HomeScreen() {
   const notionModalRef: any = useRef(null);
@@ -20,15 +19,6 @@ function HomeScreen() {
   const navigation = useNavigation();
   const [notions, setNotions] = useState([]);
   const [tags, setTags] = useState([]);
-  const { exeSql, getDbFile } = useSqlite();
-  getDbFile();
-
-  // useEffect(() => {
-  //   const asysnGetData = async () => {
-  //     await getData();
-  //   };
-  //   asysnGetData();
-  // });
 
   // 页面聚焦时事件
   useFocusEffect(
@@ -39,6 +29,11 @@ function HomeScreen() {
       };
     }, []),
   );
+
+  useEffect(() => {
+    // getDbFile();
+    getData();
+  }, []);
 
   // 切换模态框
   const toggleModal = () => {
@@ -56,28 +51,30 @@ function HomeScreen() {
   // 先全部获取异步数据，然后再赋值
   const getData = async () => {
     setIsLodingData(true); // 设置加载状态为 true
-
-    await exeSql("searchAllNotions", [])
+    exeSql("searchAllNotions", [])
       .then(
-        async res => {
-          console.log("res1-1=", res);
-          for (let i = 0; i < res.rows.length; i++) {
-            await exeSql("searchTagNameById", [res.rows[i].tag]).then(res2 => {
-              res.rows[i].tag = res2.rows[0].name;
-            });
+        async (res: any) => {
+          console.log(res);
+          for (let i = 0; i < res.length; i++) {
+            await exeSql("searchTagNameById", [res[i].tag]).then(
+              (res2: any) => {
+                res[i].tag = res2[0].name;
+              },
+            );
           }
-          console.log("res1-2=", res);
-
-          setNotions(res.rows);
+          setNotions(res);
         },
         () => {},
       )
+      .catch(error => {
+        console.error("Error occurred:", error);
+      })
       .finally(() => {});
 
     await exeSql("searchAllTags", [])
       .then(
-        async res => {
-          setTags(res.rows);
+        async (res: any) => {
+          setTags(res);
         },
         () => {},
       )

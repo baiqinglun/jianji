@@ -1,7 +1,8 @@
-import { Text, StyleSheet } from "react-native";
+import { Text } from "react-native";
 import React from "react";
 import { Portal, Dialog, Button } from "react-native-paper";
 import Colors from "@/constants/Colors";
+import styles from "./Dialog.styles";
 
 export type MyDialog = {
   content: string;
@@ -52,11 +53,5 @@ const MyDialog = ({
     </Portal>
   );
 };
-
-const styles = StyleSheet.create({
-  title: {
-    textAlign: "center",
-  },
-});
 
 export default MyDialog;
