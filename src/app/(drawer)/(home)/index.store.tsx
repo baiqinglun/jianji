@@ -65,7 +65,7 @@ const useIndex = () => {
   useEffect(() => {
     // deleteDb();
     // initDbFile();
-    getData();
+    // getData();
     // onRefresh();
   }, []);
 

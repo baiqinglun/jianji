@@ -19,3 +19,10 @@ export type TagType = {
 export type TagListType = NotionType[];
 
 export type CartItemType = "show" | "edit";
+
+export type UserType = {
+  name: string;
+  password: string;
+  image: string;
+  create_time: number;
+};

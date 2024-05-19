@@ -30,6 +30,9 @@ const sqls: any = {
   deleteNotionById: "DELETE FROM notions WHERE id = ?",
   deleteTagById: "DELETE FROM tags WHERE id = ?",
   updateTagById: "UPDATE tags SET name = ?,update_time = ? WHERE id = ?",
+  searchUser: "SELECT * FROM user",
+  searchNotionCount: "SELECT COUNT(*) FROM notions",
+  searchTagCount: "SELECT COUNT(*) FROM tags",
 };
 
 let db = SQLite.openDatabase("mydata2.db");
@@ -108,6 +111,10 @@ const SqliteProvider = ({ children }: PropsWithChildren) => {
     const create_time: any = dayjs().valueOf();
     const update_time: any = create_time;
 
+    if (db == null) {
+      openDb();
+    }
+
     await db
       ?.execAsync(
         [
@@ -117,6 +124,10 @@ const SqliteProvider = ({ children }: PropsWithChildren) => {
           },
           {
             sql: "CREATE TABLE IF NOT EXISTS tags (id TEXT,name TEXT,father TEXT,create_time INTEGER,update_time INTEGER)",
+            args: [],
+          },
+          {
+            sql: "CREATE TABLE IF NOT EXISTS user (name TEXT,password TEXT,image TEXT,create_time INTEGER)",
             args: [],
           },
         ],
@@ -142,6 +153,15 @@ const SqliteProvider = ({ children }: PropsWithChildren) => {
           {
             sql: "INSERT INTO tags (id,name,father,create_time,update_time) VALUES (?, ?, ?, ?,?)",
             args: [tag_id, "编程", "", create_time, update_time],
+          },
+          {
+            sql: "INSERT INTO user (name,password,image,create_time) VALUES (?,?, ?,?)",
+            args: [
+              "大白不太白",
+              "123456",
+              "https://test-123456-md-images.oss-cn-beijing.aliyuncs.com/img/202405192246485.jpg",
+              create_time,
+            ],
           },
         ],
         readOnly,

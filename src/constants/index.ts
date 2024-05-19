@@ -9,10 +9,18 @@ import {
   TagType,
   TagListType,
   CartItemType,
+  UserType,
 } from "./Types";
 
 const { defalutFontSize, defalutSize, FontSize } = Size;
 
 export { Colors, Dimensions, Images, Settings };
 export { defalutFontSize, defalutSize, FontSize };
-export { NotionListType, NotionType, TagType, TagListType, CartItemType };
+export {
+  NotionListType,
+  NotionType,
+  TagType,
+  TagListType,
+  CartItemType,
+  UserType,
+};
