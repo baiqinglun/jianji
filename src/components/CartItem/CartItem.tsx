@@ -20,13 +20,14 @@ const CartItem = ({ notion, cartType, func }: any) => {
     isList,
     setIsList,
     hideDialog,
-    toggleDialog,
     shareNotion,
     copyNotionContent,
     editNotion,
     deleteNotion,
     isChecked,
     setIsChecked,
+    confirmDeleteNotion,
+    cancelDeleteNotion,
   } = useCartItem({ notion });
 
   return (
@@ -133,8 +134,8 @@ const CartItem = ({ notion, cartType, func }: any) => {
         <Dialog
           content={notion.content}
           visible={isDialog}
-          onConfirmClick={toggleDialog}
-          onCancelClick={toggleDialog}
+          onConfirmClick={confirmDeleteNotion}
+          onCancelClick={cancelDeleteNotion}
           onDismiss={hideDialog}
         />
       </View>

@@ -27,6 +27,7 @@ const sqls: any = {
   searchAllTags: "SELECT * FROM tags",
   insertTag:
     "INSERT INTO tags (id,name,father,create_time,update_time) VALUES (?, ?, ?, ?,?)",
+  deleteNotionById: "DELETE FROM notions WHERE id = ?",
 };
 
 const SqliteContext = createContext<SqliteType>({
