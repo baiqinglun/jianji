@@ -1,25 +1,14 @@
-import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
 import { Link } from "expo-router";
 import { List } from "react-native-paper";
 import { MaterialIcons } from "@expo/vector-icons";
-import { noteList } from "@assets/data/noteList";
 import { DivideLine } from "@/components";
 import { FontSize, defalutSize, Colors, Images } from "@/constants";
-import { useSqlite } from "@/providers/SqliteProvider";
+import useCustomDrawer from "./custom-drawer.store";
 
 const CustomDrawer = () => {
-  const [renameModal, setRenameModal] = useState<boolean>(false);
-  const { exeSql } = useSqlite();
-  const [tags, setTags] = useState([]);
+  const { tags, tagRename } = useCustomDrawer();
 
-  useEffect(() => {
-    getData();
-  }, []);
-
-  const getData = async () => {};
-
-  const tagRename = () => {};
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -75,38 +64,35 @@ const CustomDrawer = () => {
           title=""
           style={{ backgroundColor: "#fff" }}
         >
-          {noteList.map(item => (
-            <Link
-              key={item.id}
-              href={"/(drawer)/(home)/"}
-              asChild
-            >
-              <List.Item
-                descriptionStyle={{ backgroundColor: "red" }}
-                rippleColor={Colors.light.tagBg}
-                titleStyle={{ color: Colors.light.defalutText }}
-                style={{ backgroundColor: "#fff" }}
-                title={item.name}
-                left={props => (
+          <Link
+            href={"/(drawer)/(home)/"}
+            asChild
+          >
+            <List.Item
+              descriptionStyle={{ backgroundColor: "red" }}
+              rippleColor={Colors.light.tagBg}
+              titleStyle={{ color: Colors.light.defalutText }}
+              style={{ backgroundColor: "#fff" }}
+              title={"全部简记"}
+              left={props => (
+                <List.Icon
+                  {...props}
+                  icon="book-outline"
+                />
+              )}
+              right={props => (
+                <View
+                  style={{ flexDirection: "row", justifyContent: "flex-end" }}
+                >
+                  <Text>{4}</Text>
                   <List.Icon
                     {...props}
-                    icon="book-outline"
+                    icon="chevron-right"
                   />
-                )}
-                right={props => (
-                  <View
-                    style={{ flexDirection: "row", justifyContent: "flex-end" }}
-                  >
-                    <Text>{item.count}</Text>
-                    <List.Icon
-                      {...props}
-                      icon="chevron-right"
-                    />
-                  </View>
-                )}
-              ></List.Item>
-            </Link>
-          ))}
+                </View>
+              )}
+            ></List.Item>
+          </Link>
         </List.Section>
 
         <DivideLine

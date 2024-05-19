@@ -81,7 +81,7 @@ const SqliteProvider = ({ children }: PropsWithChildren) => {
         db
           ?.execAsync([{ sql: sqls[type], args: data }], readOnly)
           .then(result => {
-            console.log(result);
+            console.log("result=", result);
             resolve(result);
           });
       } catch (error) {
