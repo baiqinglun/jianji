@@ -2,8 +2,14 @@ import { useState } from "react";
 import { copyToClipboard } from "@/libs";
 import { router } from "expo-router";
 import { useSqlite } from "@/providers/SqliteProvider";
+import { NotionType } from "@/constants";
 
-const useCartItem = ({ notion }: any) => {
+type Props = {
+  notion: NotionType;
+  onRefresh: () => void;
+};
+
+const useCartItem = ({ notion, onRefresh }: Props) => {
   const [isDialog, setIsDialog] = useState<boolean>(false);
   const [isList, setIsList] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState(false);
@@ -48,6 +54,7 @@ const useCartItem = ({ notion }: any) => {
       console.log("删除成功");
       setIsList(false);
       setIsDialog(false);
+      onRefresh();
     });
   };
 

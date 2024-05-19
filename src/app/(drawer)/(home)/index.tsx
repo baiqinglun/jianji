@@ -1,65 +1,27 @@
-import { useEffect, useRef, useState } from "react";
 import { Pressable, View, FlatList, Modal, RefreshControl } from "react-native";
 import { Stack, Link } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
+import { DrawerActions } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
 import styles from "./index.styles";
 import { CartItem, CreateNotionModal } from "@/components";
 import { defalutSize, Colors } from "@/constants";
-import { useSqlite } from "@/providers/SqliteProvider";
+import useIndex from "./index.store";
 
 function HomeScreen() {
-  const notionModalRef: any = useRef(null);
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [isLodingData, setIsLodingData] = useState(true);
-  const navigation = useNavigation();
-  const [notions, setNotions] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const { exeSql, deleteDb, initDbFile } = useSqlite();
-
-  useEffect(() => {
-    // deleteDb();
-    // initDbFile();
-    getData();
-  }, []);
-
-  // 切换模态框
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
-
-  // 添加灵感模态框
-  const openModal = async () => {
-    toggleModal();
-    notionModalRef?.current?.inputOnFocus();
-  };
-
-  // 获取数据并添加至列表
-  // 这里要注意异步循环，要先设置每个对象的tag值，然后再setNotions
-  // 先全部获取异步数据，然后再赋值
-  const getData = async () => {
-    setIsLodingData(true); // 设置加载状态为 true
-
-    await exeSql("searchAllNotions", []).then(async searchAllNotionsRes => {
-      for (let i = 0; i < searchAllNotionsRes[0].rows.length; i++) {
-        await exeSql("searchTagNameById", [
-          searchAllNotionsRes[0].rows[i].tag,
-        ]).then(searchTagNameByIdRes => {
-          searchAllNotionsRes[0].rows[i].tag =
-            searchTagNameByIdRes[0].rows[0]?.name;
-        });
-      }
-      setNotions(searchAllNotionsRes[0].rows);
-    });
-
-    setIsLodingData(false);
-  };
-
-  const onRefresh = () => {
-    getData();
-  };
+  const {
+    notions,
+    isLodingData,
+    refreshing,
+    onRefresh,
+    notionModalRef,
+    isModalVisible,
+    toggleModal,
+    setModalVisible,
+    getData,
+    navigation,
+  } = useIndex();
 
   return (
     <View style={styles.container}>
@@ -118,7 +80,8 @@ function HomeScreen() {
             <CartItem
               cartType="show"
               notion={item}
-              func={getData}
+              getData={getData}
+              onRefresh={onRefresh}
             />
           )}
           contentContainerStyle={{
@@ -138,7 +101,7 @@ function HomeScreen() {
       <View style={styles.button}>
         <Pressable
           onPress={() => {
-            openModal();
+            toggleModal();
           }}
           style={styles.buttonIcon}
         >
@@ -164,7 +127,7 @@ function HomeScreen() {
       >
         {/* 传递给子组件一些数值及函数 */}
         <CreateNotionModal
-          props={{ toggleModal, isModalVisible, getData }}
+          props={{ id: "", toggleModal, onRefresh, getData }}
           ref={notionModalRef}
         />
       </Modal>

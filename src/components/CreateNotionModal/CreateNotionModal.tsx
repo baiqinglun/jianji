@@ -9,8 +9,19 @@ import styles from "./CreateNotionModal.styles";
 import { pasteFromClipboard } from "@/libs";
 import { Colors } from "@/constants";
 
-const CreateNotionModal = forwardRef(({ props }: any, ref: any) => {
-  const { toggleModal, id } = props;
+type createNotionModalProps = {
+  id: string;
+  onRefresh: () => void;
+  toggleModal: () => void;
+  getData: () => void;
+};
+
+type Props = {
+  props: createNotionModalProps;
+};
+
+const CreateNotionModal = forwardRef(({ props }: Props, ref: any) => {
+  const { toggleModal, id, onRefresh, getData } = props;
 
   const {
     textInput,
@@ -28,7 +39,7 @@ const CreateNotionModal = forwardRef(({ props }: any, ref: any) => {
     updata,
     create,
     setIsShowTagsPop,
-  } = useCreateNotionModal({ id, toggleModal });
+  } = useCreateNotionModal({ id, toggleModal, onRefresh, getData });
 
   // 向外导出的函数
   useImperativeHandle(ref, () => ({

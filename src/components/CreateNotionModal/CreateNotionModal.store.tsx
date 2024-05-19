@@ -3,12 +3,25 @@ import { useSqlite } from "@/providers/SqliteProvider";
 import dayjs from "dayjs";
 import * as Crypto from "expo-crypto";
 
-const useCreateNotionModal = ({ id, toggleModal }: any) => {
+type createNotionModalProps = {
+  id: string;
+  onRefresh: () => void;
+  toggleModal: () => void;
+  getData: () => void;
+};
+
+const useCreateNotionModal = ({
+  id,
+  onRefresh,
+  toggleModal,
+  getData,
+}: createNotionModalProps) => {
   const { exeSql } = useSqlite();
   const [textInput, setTextInput] = useState<string>("");
   const [tagInput, setTagInput] = useState<string>("");
   const [isShowTagsPop, setIsShowTagsPop] = useState<boolean>(false);
   const [tags, setTags] = useState([]);
+  console.log(onRefresh);
 
   // 获取父组件传递的值与方法
   const inputRef: any = useRef(null);
@@ -28,7 +41,6 @@ const useCreateNotionModal = ({ id, toggleModal }: any) => {
 
   // 选择标签后
   const selectTag = (tagid: string, tagname: string) => {
-    console.log(tagname);
     setIsShowTagsPop(false);
     setTagInput(tagname);
   };
@@ -38,19 +50,21 @@ const useCreateNotionModal = ({ id, toggleModal }: any) => {
 
   // 更新数据
   const updata = async () => {
-    exeSql("searchNotionById", [id]).then(async (searchNotionByIdRes: any) => {
-      if (searchNotionByIdRes[0].rows[0].content === textInput) {
+    await exeSql("searchNotionById", [id]).then(
+      async (searchNotionByIdRes: any) => {
+        if (searchNotionByIdRes[0]?.rows[0]?.content === textInput) {
+          toggleModal();
+          return;
+        }
+        const updata_time = dayjs().valueOf();
+        await exeSql("updateNotionById", [textInput, updata_time, id]).then(
+          () => {
+            console.log("更新数据成功");
+          },
+        );
         toggleModal();
-        return;
-      }
-      const updata_time = dayjs().valueOf();
-      await exeSql("updateNotionById", [textInput, updata_time, id]).then(
-        () => {
-          console.log("更新数据成功");
-        },
-      );
-      toggleModal();
-    });
+      },
+    );
   };
 
   // 创建灵感
@@ -97,6 +111,7 @@ const useCreateNotionModal = ({ id, toggleModal }: any) => {
 
     // 执行成功后的操作
     toggleModal();
+    onRefresh();
     setTextInput("");
   };
 

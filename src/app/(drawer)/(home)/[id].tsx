@@ -1,15 +1,25 @@
 import { useEffect, useState, useRef } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { Stack, router } from "expo-router";
+import { Stack, router, useNavigation } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams } from "expo-router";
 import { Dialog } from "@rneui/themed";
 import { Colors, defalutSize, FontSize } from "@/constants";
 import { CreateNotionModal } from "@/components";
 import { useSqlite } from "@/providers/SqliteProvider";
+import { useRoute } from "@react-navigation/native";
+
+type IdScreenProps = {
+  id: string;
+};
 
 const IdScreen = () => {
-  const { id }: any = useLocalSearchParams();
+  const { id }: Partial<IdScreenProps> = useLocalSearchParams();
+  const route = useRoute();
+  const { params }: any = route;
+  // const onRefresh = new Function(`return ${params.onRefreshString}`)();
+  const onRefresh = params.onRefresh;
+
   const [isModalVisible, setModalVisible] = useState(false);
   const notionModalRef: any = useRef(null);
   const { exeSql } = useSqlite();
@@ -53,7 +63,7 @@ const IdScreen = () => {
         }}
       />
       <CreateNotionModal
-        props={{ toggleModal, isModalVisible, id }}
+        props={{ toggleModal, id, onRefresh }}
         ref={notionModalRef}
       />
       <View></View>

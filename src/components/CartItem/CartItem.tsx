@@ -7,14 +7,21 @@ import { Tooltip } from "@rneui/themed";
 import relativeTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
 
-import { Colors } from "@/constants";
+import { NotionType, CartItemType, Colors } from "@/constants";
 import { Dialog } from "@/components/Dialog";
 import styles from "./CartItem.styles";
 import useCartItem from "./CartItem.store";
 
 dayjs.extend(relativeTime);
 
-const CartItem = ({ notion, cartType, func }: any) => {
+type Props = {
+  notion: NotionType;
+  cartType: CartItemType;
+  getData: () => void;
+  onRefresh: () => void;
+};
+
+const CartItem = ({ notion, cartType, getData, onRefresh }: Props) => {
   const {
     isDialog,
     isList,
@@ -28,7 +35,7 @@ const CartItem = ({ notion, cartType, func }: any) => {
     setIsChecked,
     confirmDeleteNotion,
     cancelDeleteNotion,
-  } = useCartItem({ notion });
+  } = useCartItem({ notion, onRefresh });
 
   return (
     <>
@@ -116,11 +123,10 @@ const CartItem = ({ notion, cartType, func }: any) => {
 
         {/* 内容 */}
         <Link
-          style={{ height: 70 }}
           href={{
             pathname: `/${notion.id}`,
-            params: { func: func },
           }}
+          style={{ height: 70 }}
         >
           <Text
             numberOfLines={1}

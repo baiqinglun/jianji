@@ -1,5 +1,5 @@
 import { Asset } from "expo-asset";
-import { PropsWithChildren, createContext, useContext, useState } from "react";
+import { PropsWithChildren, createContext, useContext } from "react";
 import * as FileSystem from "expo-file-system";
 import * as SQLite from "expo-sqlite";
 import * as Crypto from "expo-crypto";
@@ -30,6 +30,8 @@ const sqls: any = {
   deleteNotionById: "DELETE FROM notions WHERE id = ?",
 };
 
+let db = SQLite.openDatabase("mydata2.db");
+
 const SqliteContext = createContext<SqliteType>({
   db: null,
   openDb: async () => {},
@@ -40,12 +42,9 @@ const SqliteContext = createContext<SqliteType>({
 });
 
 const SqliteProvider = ({ children }: PropsWithChildren) => {
-  const [db, setDb] = useState<null | SQLite.SQLiteDatabase>(null);
-
   // 打开数据库
   const openDb = async () => {
     console.log("打开数据库");
-    setDb(SQLite.openDatabase("mydata2.db"));
   };
 
   // 获取远程db数据
@@ -71,22 +70,24 @@ const SqliteProvider = ({ children }: PropsWithChildren) => {
 
   // 执行语句
   const exeSql = async (type: string, data: any[]) => {
+    if (db == null) {
+      db = SQLite.openDatabase("mydata2.db");
+    }
     return new Promise((resolve, reject) => {
-      try {
-        if (db == null) {
-          console.log("数据库不存在");
-          openDb();
+      if (db != null) {
+        console.log("数据库已经打开");
+        try {
+          const readOnly = false;
+          db
+            ?.execAsync([{ sql: sqls[type], args: data }], readOnly)
+            .then(result => {
+              console.log("result=", result);
+              resolve(result);
+            });
+        } catch (error) {
+          console.error("An error occurred:", error);
+          reject(error);
         }
-        const readOnly = false;
-        db
-          ?.execAsync([{ sql: sqls[type], args: data }], readOnly)
-          .then(result => {
-            console.log("result=", result);
-            resolve(result);
-          });
-      } catch (error) {
-        console.error("An error occurred:", error);
-        reject(error);
       }
     });
   };
