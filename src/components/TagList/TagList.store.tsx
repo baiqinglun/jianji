@@ -6,7 +6,7 @@ import { TagType } from "@/constants";
 import dayjs from "dayjs";
 import * as Crypto from "expo-crypto";
 
-const useCustomDrawer = () => {
+const useTagList = () => {
   const [renameModal, setRenameModal] = useState<boolean>(false);
   const [tags, setTags] = useState([]);
   const [isShowTagDeal, setIsShowTagDeal] = useState<boolean>(false);
@@ -175,4 +175,4 @@ const useCustomDrawer = () => {
   };
 };
 
-export default useCustomDrawer;
+export default useTagList;

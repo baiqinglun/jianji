@@ -8,7 +8,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
 
 import { NotionType, CartItemType, Colors } from "@/constants";
-import { MyDialog } from "@/components";
+import { MyDialog } from "@/components/Dialog";
 import styles from "./CartItem.styles";
 import useCartItem from "./CartItem.store";
 

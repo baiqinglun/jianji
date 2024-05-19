@@ -1,5 +1,5 @@
 import Drawer from "expo-router/drawer";
-import CustomDrawer from "./custom-drawer";
+import MainDrawerScreen from "./MainDrawerScreen";
 import Colors from "@/constants/Colors";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -8,7 +8,7 @@ const Layout = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Drawer
         initialRouteName="Home"
-        drawerContent={() => <CustomDrawer />}
+        drawerContent={() => <MainDrawerScreen />}
         screenOptions={{
           // 抽屉全部字体
           drawerLabelStyle: {
