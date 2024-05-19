@@ -4,7 +4,7 @@ import { Portal, Dialog, Button } from "react-native-paper";
 import { Colors } from "@/constants";
 import styles from "./Dialog.styles";
 
-export type MyDialog = {
+export type MyDialogType = {
   content: string;
   visible: boolean;
   onConfirmClick: () => void;
@@ -18,7 +18,7 @@ const MyDialog = ({
   onConfirmClick,
   onCancelClick,
   onDismiss,
-}: MyDialog) => {
+}: MyDialogType) => {
   return (
     <Portal>
       <Dialog

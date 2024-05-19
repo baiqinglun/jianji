@@ -5,7 +5,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { Checkbox } from "react-native-paper";
 import { FontSize, defalutSize, Colors } from "@/constants";
-import { CartItem, Dialog } from "@/components";
+import { CartItem, MyDialog } from "@/components";
 import notions from "@assetsdata/notions";
 
 const Index = () => {
@@ -84,7 +84,7 @@ const Index = () => {
       />
 
       {/* 弹窗 */}
-      <Dialog
+      <MyDialog
         content="是否全部删除"
         visible={isDelete}
         onConfirmClick={deleteSelect}

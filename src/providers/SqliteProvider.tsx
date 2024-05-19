@@ -28,6 +28,8 @@ const sqls: any = {
   insertTag:
     "INSERT INTO tags (id,name,father,create_time,update_time) VALUES (?, ?, ?, ?,?)",
   deleteNotionById: "DELETE FROM notions WHERE id = ?",
+  deleteTagById: "DELETE FROM tags WHERE id = ?",
+  updateTagById: "UPDATE tags SET name = ?,update_time = ? WHERE id = ?",
 };
 
 let db = SQLite.openDatabase("mydata2.db");
@@ -45,6 +47,7 @@ const SqliteProvider = ({ children }: PropsWithChildren) => {
   // 打开数据库
   const openDb = async () => {
     console.log("打开数据库");
+    db = SQLite.openDatabase("mydata2.db");
   };
 
   // 获取远程db数据
@@ -71,17 +74,16 @@ const SqliteProvider = ({ children }: PropsWithChildren) => {
   // 执行语句
   const exeSql = async (type: string, data: any[]) => {
     if (db == null) {
-      db = SQLite.openDatabase("mydata2.db");
+      openDb();
     }
     return new Promise((resolve, reject) => {
       if (db != null) {
-        console.log("数据库已经打开");
         try {
           const readOnly = false;
           db
             ?.execAsync([{ sql: sqls[type], args: data }], readOnly)
             .then(result => {
-              console.log("result=", result);
+              // console.log("result=", result);
               resolve(result);
             });
         } catch (error) {

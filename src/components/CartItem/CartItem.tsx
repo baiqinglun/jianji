@@ -8,7 +8,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
 
 import { NotionType, CartItemType, Colors } from "@/constants";
-import { Dialog } from "@/components/Dialog";
+import { MyDialog } from "@/components";
 import styles from "./CartItem.styles";
 import useCartItem from "./CartItem.store";
 
@@ -137,7 +137,7 @@ const CartItem = ({ notion, cartType, getData, onRefresh }: Props) => {
         </Link>
 
         {/* 是否删除弹窗 */}
-        <Dialog
+        <MyDialog
           content={notion.content}
           visible={isDialog}
           onConfirmClick={confirmDeleteNotion}

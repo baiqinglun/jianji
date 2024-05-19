@@ -1,13 +1,37 @@
-import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
+import { View, Text, Image, ScrollView } from "react-native";
 import { Link } from "expo-router";
-import { List } from "react-native-paper";
+import { Button, Dialog, List, Portal, TextInput } from "react-native-paper";
 import { MaterialIcons } from "@expo/vector-icons";
-import { DivideLine } from "@/components";
-import { FontSize, defalutSize, Colors, Images } from "@/constants";
+import { DivideLine, MyDialog } from "@/components";
+import { Colors, Images } from "@/constants";
 import useCustomDrawer from "./custom-drawer.store";
+import styles from "./custom-drawer.style";
 
 const CustomDrawer = () => {
-  const { tags, tagRename } = useCustomDrawer();
+  const {
+    tags,
+    inputTagName,
+    deleteTagModalTitle,
+    setInputTagName,
+    showTagDeal,
+    tagRename,
+    confirmDeleteTag,
+    cancelDeleteTag,
+    confirmRenameTag,
+    cancelRenameTag,
+    isShowTagDeal,
+    isShowTagDelete,
+    dismissTagDelete,
+    isShowTagRename,
+    toggleIsShowTagRename,
+    toggleIsShowTagDelete,
+    toggleIsShowTagDeal,
+    isTagFolding,
+    setIsTagFolding,
+    dismissTagRename,
+    dismissTagDeal,
+    addTag,
+  } = useCustomDrawer();
 
   return (
     <ScrollView>
@@ -99,47 +123,71 @@ const CustomDrawer = () => {
           color={Colors.light.other}
           width={250}
         />
+
+        <View style={styles.tagDeal}>
+          <Button
+            icon="tag-plus-outline"
+            mode="outlined"
+            onPress={() => {
+              addTag();
+            }}
+          >
+            添加标签
+          </Button>
+          <Button
+            icon={isTagFolding ? "arrow-down" : "arrow-up"}
+            mode="outlined"
+            onPress={() => console.log(setIsTagFolding(!isTagFolding))}
+          >
+            {isTagFolding ? "折叠" : "展开"}标签
+          </Button>
+        </View>
+
         {/* 标签栏 */}
-        <List.Section
-          title=""
-          style={{ backgroundColor: "#fff" }}
-        >
-          {tags
-            .filter((item1: any) => {
-              return item1.father == "null";
-            })
-            .map((item2: any) => (
-              <List.Accordion
-                key={item2.id}
-                onPress={() => {
-                  tagRename();
-                }}
-                onLongPress={() => {}}
-                descriptionStyle={{ backgroundColor: "red" }}
-                rippleColor={Colors.light.tagBg}
-                titleStyle={{ color: Colors.light.defalutText }}
-                style={{ backgroundColor: "#fff" }}
-                title={item2.name}
-                left={props => (
-                  <List.Icon
-                    {...props}
-                    icon="tag-outline"
-                  />
-                )}
-              >
-                {tags
-                  .filter((item3: any) => {
-                    return item3.father == item2.id;
-                  })
-                  .map((item4: any) => (
-                    <List.Item
-                      key={item4.name}
-                      title={item4.name}
-                    ></List.Item>
-                  ))}
-              </List.Accordion>
-            ))}
-        </List.Section>
+        {isTagFolding && (
+          <List.Section
+            title=""
+            style={{ backgroundColor: "#fff" }}
+          >
+            {tags
+              .filter((item1: any) => {
+                return item1.father === "";
+              })
+              .map((item2: any) => (
+                <List.Accordion
+                  key={item2.id}
+                  onPress={() => {
+                    tagRename();
+                  }}
+                  onLongPress={() => {
+                    showTagDeal(item2);
+                  }}
+                  descriptionStyle={{ backgroundColor: "red" }}
+                  rippleColor={Colors.light.tagBg}
+                  titleStyle={{ color: Colors.light.defalutText }}
+                  style={{ backgroundColor: "#fff" }}
+                  title={item2.name}
+                  left={props => (
+                    <List.Icon
+                      {...props}
+                      icon="tag-outline"
+                    />
+                  )}
+                >
+                  {tags
+                    .filter((item3: any) => {
+                      return item3.father === item2.id;
+                    })
+                    .map((item4: any) => (
+                      <List.Item
+                        key={item4.name}
+                        title={item4.name}
+                      ></List.Item>
+                    ))}
+                </List.Accordion>
+              ))}
+          </List.Section>
+        )}
 
         <DivideLine
           color={Colors.light.other}
@@ -181,109 +229,81 @@ const CustomDrawer = () => {
             ></List.Item>
           </Link>
         </List.Section>
+
+        <Portal>
+          <Dialog
+            style={styles.tagDealDialog}
+            visible={isShowTagDeal}
+            onDismiss={dismissTagDeal}
+          >
+            <Dialog.Content>
+              <Button
+                textColor={Colors.light.defalutText}
+                onPress={() => {
+                  toggleIsShowTagRename();
+                  toggleIsShowTagDeal();
+                }}
+              >
+                重命名
+              </Button>
+              <Button
+                textColor="red"
+                onPress={() => {
+                  toggleIsShowTagDelete();
+                  toggleIsShowTagDeal();
+                }}
+              >
+                删除
+              </Button>
+            </Dialog.Content>
+          </Dialog>
+        </Portal>
+
+        {/* 重命名 */}
+        <Portal>
+          <Dialog
+            style={styles.tagDealDialog}
+            visible={isShowTagRename}
+            onDismiss={dismissTagRename}
+          >
+            <Dialog.Content>
+              <TextInput
+                value={inputTagName}
+                onChangeText={text => setInputTagName(text)}
+              />
+              <Dialog.Actions>
+                <Button
+                  textColor="red"
+                  onPress={() => {
+                    confirmRenameTag();
+                  }}
+                >
+                  确认
+                </Button>
+                <Button
+                  textColor="red"
+                  onPress={() => {
+                    cancelRenameTag();
+                  }}
+                >
+                  取消
+                </Button>
+              </Dialog.Actions>
+            </Dialog.Content>
+          </Dialog>
+        </Portal>
+
+        {/* 删除 */}
+        <MyDialog
+          content={deleteTagModalTitle}
+          visible={isShowTagDelete}
+          onConfirmClick={confirmDeleteTag}
+          onCancelClick={cancelDeleteTag}
+          onDismiss={dismissTagDelete}
+        />
       </View>
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: 40,
-    margin: defalutSize,
-  },
-  top: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    margin: defalutSize,
-  },
-  user: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  avater: {
-    width: 50,
-    height: 50,
-    borderRadius: 50,
-  },
-  username: {
-    fontSize: FontSize.l,
-    color: Colors.light.defalutText,
-    marginLeft: defalutSize,
-  },
-  setting: {},
-  statistics: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: defalutSize,
-    alignItems: "center",
-  },
-  count: {
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  countText: {
-    color: Colors.light.defalutText,
-    fontSize: FontSize.l,
-    fontWeight: "600",
-  },
-  countText1: {
-    color: Colors.light.defalutText,
-    fontSize: FontSize.ml,
-  },
-  navigateContainer: {
-    flexDirection: "column",
-    justifyContent: "center",
-    marginTop: defalutSize,
-    padding: defalutSize,
-    gap: defalutSize * 3,
-  },
-  navigate: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  navigateLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  navigateLeftText: {
-    marginLeft: defalutSize,
-    fontSize: FontSize.m,
-  },
-  navigaterRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  navigateRightText: {
-    marginRight: defalutSize,
-    fontSize: FontSize.m,
-  },
-  allTagText: {
-    margin: defalutSize,
-    // marginTop:defalutSize*5,
-    fontSize: FontSize.ml,
-  },
-  tagContainer: {
-    flexDirection: "column",
-    margin: defalutSize,
-    gap: defalutSize * 2,
-  },
-  tag: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  tagLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  tagLeftText: {
-    marginLeft: defalutSize,
-    color: Colors.light.defalutText,
-    fontSize: FontSize.ml,
-  },
-  tagRight: {},
-});
 
 export default CustomDrawer;

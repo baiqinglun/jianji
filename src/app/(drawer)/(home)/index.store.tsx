@@ -36,8 +36,6 @@ const useIndex = () => {
           return row;
         }),
       );
-      console.log("加载数据完成");
-
       setNotions(updatedRows);
     } catch (error) {
       console.error("Error fetching data", error);
@@ -65,11 +63,6 @@ const useIndex = () => {
   }, [navigation]);
 
   useEffect(() => {
-    if (route.name === "index") {
-      console.log("index888");
-    }
-    console.log(route.name);
-
     // deleteDb();
     // initDbFile();
     getData();
