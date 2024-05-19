@@ -1,33 +1,34 @@
-// 核心库
-import React, {
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react";
+import React, { forwardRef, useImperativeHandle } from "react";
 import { View, Text, TextInput, Pressable } from "react-native";
-
-// 第三方库
 import { Ionicons } from "@expo/vector-icons";
-import * as Crypto from "expo-crypto";
-import dayjs from "dayjs";
 import { Divider } from "react-native-paper";
 
 // 自定义库
+import useCreateNotionModal from "./CreateNotionModal.store";
+import styles from "./CreateNotionModal.styles";
 import { pasteFromClipboard } from "@/libs";
 import { Colors } from "@/constants";
-import styles from "./CreateNotionModal.styles";
-import { useSqlite } from "@/providers/SqliteProvider";
 
 const CreateNotionModal = forwardRef(({ props }: any, ref: any) => {
-  const [textInput, setTextInput] = useState<string>("");
-  const [tagInput, setTagInput] = useState<string>("");
-  const [isShowTagsPop, setIsShowTagsPop] = useState<boolean>(false);
-  // 获取父组件传递的值与方法
-  const inputRef: any = useRef(null);
-  const inputTagRef: any = useRef(null);
-  const { toggleModal, id, tags } = props;
-  const { exeSql } = useSqlite();
+  const { toggleModal, id } = props;
+
+  const {
+    textInput,
+    setTextInput,
+    tagInput,
+    setTagInput,
+    tags,
+    isShowTagsPop,
+    inputRef,
+    inputTagRef,
+    showTagsPop,
+    inputTagChange,
+    selectTag,
+    inputOnFocus,
+    updata,
+    create,
+    setIsShowTagsPop,
+  } = useCreateNotionModal({ id, toggleModal });
 
   // 向外导出的函数
   useImperativeHandle(ref, () => ({
@@ -35,90 +36,6 @@ const CreateNotionModal = forwardRef(({ props }: any, ref: any) => {
     setTextInput,
     setTagInput,
   }));
-
-  // 显示标签弹窗
-  const showTagsPop = () => {
-    setIsShowTagsPop(true);
-  };
-
-  // 输入框变化
-  const inputTagChange = (text: string) => {
-    setTagInput(text);
-    setIsShowTagsPop(true);
-    inputTagRef?.current?.focus();
-  };
-
-  // 选择标签后
-  const selectTag = (tagid: string, tagname: string) => {
-    console.log(tagname);
-    setIsShowTagsPop(false);
-    setTagInput(tagname);
-  };
-
-  // 切换模态框
-  const inputOnFocus = () => {};
-
-  // 更新数据
-  const updata = async () => {
-    exeSql("searchNotionById", [id]).then((res: any) => {
-      if (res[0]["content"] === textInput) {
-        toggleModal();
-        return;
-      }
-      const updata_time = dayjs().valueOf();
-      exeSql("updateNotionById", [textInput, updata_time, id]).then(() => {
-        console.log("更新数据成功");
-      });
-      toggleModal();
-    });
-  };
-
-  // 创建灵感
-  const create = async () => {
-    const notion_id = Crypto.randomUUID();
-    const tag_id = Crypto.randomUUID();
-    const create_time: any = dayjs().valueOf();
-    const update_time: any = create_time;
-
-    await exeSql("searchTagIdByName", [tagInput]).then(
-      (searchTagIdByNameRes: any) => {
-        const rows = searchTagIdByNameRes[0].rows;
-        if (rows.length > 0) {
-          exeSql("insertNotion", [
-            notion_id,
-            textInput,
-            rows[0].id,
-            create_time,
-            update_time,
-          ]).then(() => {
-            console.log("插入notion成功");
-          });
-        } else {
-          exeSql("insertTag", [
-            tag_id,
-            tagInput,
-            "null",
-            create_time,
-            update_time,
-          ]).then(insertTagRes => {
-            exeSql("insertNotion", [
-              notion_id,
-              textInput,
-              tag_id,
-              create_time,
-              update_time,
-            ]).then(() => {
-              console.log("插入notion成功");
-            });
-          });
-        }
-      },
-    );
-
-    // 执行成功后的操作
-    toggleModal();
-    setTextInput("");
-  };
 
   // 渲染标签列表弹窗
   const renderTagPopItem = () => {

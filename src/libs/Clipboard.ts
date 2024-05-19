@@ -5,4 +5,8 @@ const pasteFromClipboard = async (textInput: string): Promise<string> => {
   return textInput ? textInput + text : text;
 };
 
-export { pasteFromClipboard };
+const copyToClipboard = async (text: string) => {
+  await Clipboard.setStringAsync(text);
+};
+
+export { pasteFromClipboard, copyToClipboard };

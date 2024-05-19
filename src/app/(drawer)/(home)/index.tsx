@@ -16,7 +16,6 @@ function HomeScreen() {
   const [isLodingData, setIsLodingData] = useState(true);
   const navigation = useNavigation();
   const [notions, setNotions] = useState([]);
-  const [tags, setTags] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const { exeSql, deleteDb, initDbFile } = useSqlite();
 
@@ -53,10 +52,6 @@ function HomeScreen() {
         });
       }
       setNotions(searchAllNotionsRes[0].rows);
-    });
-
-    await exeSql("searchAllTags", []).then(searchAllTagsRes => {
-      setTags(searchAllTagsRes[0].rows);
     });
 
     setIsLodingData(false);
@@ -169,7 +164,7 @@ function HomeScreen() {
       >
         {/* 传递给子组件一些数值及函数 */}
         <CreateNotionModal
-          props={{ toggleModal, isModalVisible, getData, tags }}
+          props={{ toggleModal, isModalVisible, getData }}
           ref={notionModalRef}
         />
       </Modal>

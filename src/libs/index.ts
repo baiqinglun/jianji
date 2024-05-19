@@ -1,4 +1,4 @@
-import { pasteFromClipboard } from "./Clipboard";
+import { pasteFromClipboard, copyToClipboard } from "./Clipboard";
 import { removeLine } from "./DealString";
 
-export { pasteFromClipboard, removeLine };
+export { pasteFromClipboard, copyToClipboard, removeLine };

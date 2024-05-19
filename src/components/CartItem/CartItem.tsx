@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { View } from "react-native";
 import { Link } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -11,37 +10,24 @@ import dayjs from "dayjs";
 import { Colors } from "@/constants";
 import { Dialog } from "@/components/Dialog";
 import styles from "./CartItem.styles";
+import useCartItem from "./CartItem.store";
 
 dayjs.extend(relativeTime);
 
 const CartItem = ({ notion, cartType, func }: any) => {
-  const [deleteVisible, setDeleteVisible] = useState(false);
-  const [openList, setOpenList] = useState(false);
-  const [checked, setChecked] = useState(false);
-
-  const hideDialog = () => setDeleteVisible(false);
-
-  const toggleDialog = () => {
-    setDeleteVisible(!deleteVisible);
-  };
-
-  const shareNotion = () => {
-    setOpenList(!openList);
-    console.log("分享");
-  };
-  const copyNotionContent = () => {
-    setOpenList(!openList);
-    console.log("复制");
-  };
-  const editNotion = () => {
-    setOpenList(!openList);
-    console.log("编辑");
-  };
-  const deleteNotion = () => {
-    console.log("删除");
-    setOpenList(!openList);
-    setDeleteVisible(!deleteVisible);
-  };
+  const {
+    isDialog,
+    isList,
+    setIsList,
+    hideDialog,
+    toggleDialog,
+    shareNotion,
+    copyNotionContent,
+    editNotion,
+    deleteNotion,
+    isChecked,
+    setIsChecked,
+  } = useCartItem({ notion });
 
   return (
     <>
@@ -54,9 +40,9 @@ const CartItem = ({ notion, cartType, func }: any) => {
           </Text>
           {/* 弹窗 */}
           <Tooltip
-            visible={openList}
-            onOpen={() => setOpenList(true)}
-            onClose={() => setOpenList(false)}
+            visible={isList}
+            onOpen={() => setIsList(true)}
+            onClose={() => setIsList(false)}
             width={100}
             height={200}
             backgroundColor={Colors.light.background}
@@ -108,9 +94,9 @@ const CartItem = ({ notion, cartType, func }: any) => {
             ) : (
               <Checkbox
                 color={Colors.light.tint}
-                status={checked ? "checked" : "unchecked"}
+                status={isChecked ? "checked" : "unchecked"}
                 onPress={() => {
-                  setChecked(!checked);
+                  setIsChecked(!isChecked);
                 }}
               />
             )}
@@ -146,7 +132,7 @@ const CartItem = ({ notion, cartType, func }: any) => {
         {/* 是否删除弹窗 */}
         <Dialog
           content={notion.content}
-          visible={deleteVisible}
+          visible={isDialog}
           onConfirmClick={toggleDialog}
           onCancelClick={toggleDialog}
           onDismiss={hideDialog}
