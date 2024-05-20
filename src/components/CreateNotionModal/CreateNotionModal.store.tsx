@@ -21,7 +21,6 @@ const useCreateNotionModal = ({
   const [tagInput, setTagInput] = useState<string>("");
   const [isShowTagsPop, setIsShowTagsPop] = useState<boolean>(false);
   const [tags, setTags] = useState([]);
-  console.log(onRefresh);
 
   // 获取父组件传递的值与方法
   const inputRef: any = useRef(null);
