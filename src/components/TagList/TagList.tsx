@@ -32,7 +32,7 @@ const TagList = () => {
     setIsTagFolding,
     dismissTagRename,
     dismissTagDeal,
-    addTag,
+    addTagModal,
   } = useTagList();
 
   return (
@@ -42,7 +42,7 @@ const TagList = () => {
           icon="tag-plus-outline"
           mode="outlined"
           onPress={() => {
-            addTag();
+            addTagModal();
           }}
         >
           添加标签

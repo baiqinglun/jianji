@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { copyToClipboard } from "@/libs";
 import { router } from "expo-router";
-import { useSqlite } from "@/providers/SqliteProvider";
 import { NotionType } from "@/constants";
+import { useData } from "@/providers/DataProvider";
 
 type Props = {
   notion: NotionType;
@@ -13,7 +13,7 @@ const useCartItem = ({ notion, onRefresh }: Props) => {
   const [isDialog, setIsDialog] = useState<boolean>(false);
   const [isList, setIsList] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState(false);
-  const { exeSql } = useSqlite();
+  const { deleteNotion } = useData();
 
   const hideDialog = () => setIsDialog(false);
 
@@ -24,38 +24,31 @@ const useCartItem = ({ notion, onRefresh }: Props) => {
   // 分享
   const shareNotion = () => {
     setIsList(!isList);
-    console.log("分享");
   };
 
   // 复制内容
   const copyNotionContent = () => {
-    console.log(notion.content);
     copyToClipboard(notion.content);
     setIsList(!isList);
-    console.log("复制");
   };
 
   // 编辑notion
   const editNotion = () => {
     router.navigate(`/${notion.id}`);
     setIsList(!isList);
-    console.log("编辑");
   };
 
   // 删除notion
-  const deleteNotion = async () => {
+  const deleteNotionModal = async () => {
     setIsList(!isList);
     setIsDialog(!isDialog);
   };
 
   const confirmDeleteNotion = () => {
-    exeSql("deleteNotionById", [notion.id]).then(deleteNotionByIdRes => {
-      console.log(deleteNotionByIdRes);
-      console.log("删除成功");
-      setIsList(false);
-      setIsDialog(false);
-      onRefresh();
-    });
+    deleteNotion(notion.id);
+    setIsList(false);
+    setIsDialog(false);
+    onRefresh();
   };
 
   const cancelDeleteNotion = () => {
@@ -73,7 +66,7 @@ const useCartItem = ({ notion, onRefresh }: Props) => {
     shareNotion,
     copyNotionContent,
     editNotion,
-    deleteNotion,
+    deleteNotionModal,
     isChecked,
     setIsChecked,
     confirmDeleteNotion,

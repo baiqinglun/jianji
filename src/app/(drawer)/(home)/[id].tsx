@@ -27,13 +27,12 @@ const IdScreen = () => {
   // 通过传过来的id获取信息
   const getDataById = async () => {
     exeSql("searchNotionById", [id]).then((searchNotionByIdRes: any) => {
-      console.log(searchNotionByIdRes[0].rows);
       notionModalRef?.current?.setTextInput(
         searchNotionByIdRes[0].rows[0].content,
       );
       exeSql("searchTagNameById", [searchNotionByIdRes[0].rows[0].tag]).then(
         searchTagNameByIdRes => {
-          console.log(searchTagNameByIdRes);
+          searchTagNameByIdRes;
 
           notionModalRef?.current?.setTagInput(
             searchTagNameByIdRes[0].rows[0].name,

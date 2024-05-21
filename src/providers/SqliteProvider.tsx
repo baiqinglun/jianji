@@ -47,6 +47,12 @@ const SqliteContext = createContext<SqliteType>({
 });
 
 const SqliteProvider = ({ children }: PropsWithChildren) => {
+  // const [db, setDB] = useState<SQLite.SQLiteDatabase>();
+
+  // useEffect(() => {
+  //   setDB(SQLite.openDatabase("mydata2.db"));
+  // }, []);
+
   // 打开数据库
   const openDb = async () => {
     console.log("打开数据库");
@@ -85,8 +91,8 @@ const SqliteProvider = ({ children }: PropsWithChildren) => {
           const readOnly = false;
           db
             ?.execAsync([{ sql: sqls[type], args: data }], readOnly)
-            .then(result => {
-              // console.log("result=", result);
+            .then((result: any) => {
+              console.log("result=", type, result);
               resolve(result);
             });
         } catch (error) {
@@ -133,9 +139,7 @@ const SqliteProvider = ({ children }: PropsWithChildren) => {
         ],
         readOnly,
       )
-      .then(res => {
-        console.log("创建表", res);
-      });
+      .then(res => {});
 
     await db
       ?.execAsync(
@@ -166,9 +170,7 @@ const SqliteProvider = ({ children }: PropsWithChildren) => {
         ],
         readOnly,
       )
-      .then(res => {
-        console.log(res);
-      });
+      .then(res => {});
 
     await db
       ?.execAsync(
@@ -180,9 +182,7 @@ const SqliteProvider = ({ children }: PropsWithChildren) => {
         ],
         readOnly,
       )
-      .then((res: any) => {
-        console.log(res[0].rows);
-      });
+      .then((res: any) => {});
   };
 
   return (

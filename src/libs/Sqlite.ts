@@ -48,7 +48,6 @@ const exeSql = async (type: string, data: any[]) => {
         ?.execAsync([{ sql: sqls[type], args: data }], readOnly)
         .then((result: any) => {
           const rows = result[0]?.rows;
-          console.log("执行结果", rows);
           resolve(rows);
         })
         .catch((error: any) => {

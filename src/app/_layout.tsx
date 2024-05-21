@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { PaperProvider } from "react-native-paper";
 import { LogBox } from "react-native";
 import SqliteProvider from "@/providers/SqliteProvider";
+import DataProvider from "@/providers/DataProvider";
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -51,12 +52,14 @@ function RootLayoutNav() {
   return (
     <PaperProvider>
       <SqliteProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen
-            name="(drawer)"
-            options={{ headerShown: false }}
-          />
-        </Stack>
+        <DataProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen
+              name="(drawer)"
+              options={{ headerShown: false }}
+            />
+          </Stack>
+        </DataProvider>
       </SqliteProvider>
     </PaperProvider>
   );

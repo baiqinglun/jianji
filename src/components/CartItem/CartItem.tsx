@@ -30,7 +30,7 @@ const CartItem = ({ notion, cartType, getData, onRefresh }: Props) => {
     shareNotion,
     copyNotionContent,
     editNotion,
-    deleteNotion,
+    deleteNotionModal,
     isChecked,
     setIsChecked,
     confirmDeleteNotion,
@@ -86,7 +86,7 @@ const CartItem = ({ notion, cartType, getData, onRefresh }: Props) => {
                 <Button
                   style={{ width: "100%" }}
                   textColor="red"
-                  onPress={() => deleteNotion()}
+                  onPress={() => deleteNotionModal()}
                 >
                   删除
                 </Button>
