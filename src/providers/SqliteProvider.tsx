@@ -21,6 +21,7 @@ const sqls: any = {
   updateNotionById:
     "UPDATE notions SET content = ?,update_time = ? WHERE id = ?",
   searchNotionById: "SELECT content,tag FROM notions WHERE id = ?",
+  searchNotionByContent: "SELECT content,tag FROM notions WHERE content LINK ?",
   searchTagNameById: "SELECT name FROM tags WHERE id = ?",
   searchTagIdByName: "SELECT id FROM tags WHERE name = ?",
   searchChildrenTagsById: "SELECT name FROM tags WHERE father = ?",

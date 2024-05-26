@@ -10,6 +10,7 @@ import { Colors, FontSize, defalutSize, Dimensions } from "@/constants";
 import { Checkbox } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useSqlite } from "@/providers/SqliteProvider";
 
 export default function SearchScreen() {
   const insets = useSafeAreaInsets();
@@ -21,6 +22,7 @@ export default function SearchScreen() {
   const [selectedContent, setSelectedContent] = useState<
     "checked" | "unchecked"
   >("checked");
+  const { exeSql } = useSqlite();
   const navigation = useNavigation();
 
   const getStatus = (status: string) => {
@@ -28,21 +30,21 @@ export default function SearchScreen() {
       case "checked":
         return true;
       case "unchecked":
-        return true;
+        return false;
       default:
         break;
     }
   };
 
   const toggleSelectTag = () => {
-    if (selectTag == "unchecked") {
+    if (selectTag === "unchecked") {
       setSelectTag("checked");
     } else {
       setSelectTag("unchecked");
     }
   };
   const toggleSelectedContent = () => {
-    if (selectedContent == "unchecked") {
+    if (selectedContent === "unchecked") {
       setSelectedContent("checked");
     } else {
       setSelectedContent("unchecked");
@@ -54,6 +56,11 @@ export default function SearchScreen() {
   // 搜索
   const search = () => {
     setSearchText("");
+    exeSql("searchNotionByContent", [`%${searchText}%`]).then(
+      searchNotionByContentRes => {
+        console.log(searchNotionByContentRes);
+      },
+    );
   };
 
   return (

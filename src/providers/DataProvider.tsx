@@ -1,5 +1,12 @@
 import { NotionListType, TagListType, UserType } from "@/constants";
-import { PropsWithChildren, createContext, useContext, useState } from "react";
+import {
+  Dispatch,
+  PropsWithChildren,
+  SetStateAction,
+  createContext,
+  useContext,
+  useState,
+} from "react";
 import dayjs from "dayjs";
 import * as Crypto from "expo-crypto";
 import { useSqlite } from "@/providers/SqliteProvider";
@@ -9,7 +16,7 @@ type SqliteType = {
   tags: TagListType;
   userInformation: UserType;
   contentInformation: ContentInformationProp;
-  setNotions: () => void;
+  setNotions: Dispatch<SetStateAction<NotionListType>>;
   getAllNotion: () => Promise<void>;
   addNotion: (textInput: string, tagInput: string) => Promise<void>;
   updateNotion: (textInput: string, id: string) => Promise<void>;
@@ -25,8 +32,8 @@ type SqliteType = {
 const DataContext = createContext<SqliteType>({
   notions: [],
   tags: [],
-  userInformation: {},
-  contentInformation: {},
+  userInformation: { name: "", password: "", image: "", create_time: 0 },
+  contentInformation: { notionCount: 0, tagCount: 0, dayCount: 0 },
   setNotions: () => {},
   getAllNotion: async () => {},
   addNotion: async (textInput: string, tagInput: string) => {},
@@ -49,9 +56,18 @@ type ContentInformationProp = {
 const DataProvider = ({ children }: PropsWithChildren) => {
   const [notions, setNotions] = useState<NotionListType>([]);
   const [tags, setTags] = useState<TagListType>([]);
-  const [userInformation, setUserInformation] = useState<UserType>();
+  const [userInformation, setUserInformation] = useState<UserType>({
+    name: "",
+    password: "",
+    image: "",
+    create_time: 0,
+  });
   const [contentInformation, setContentInformation] =
-    useState<ContentInformationProp>();
+    useState<ContentInformationProp>({
+      notionCount: 0,
+      tagCount: 0,
+      dayCount: 0,
+    });
   const { exeSql } = useSqlite();
 
   // 获取全部notion
