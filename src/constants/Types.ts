@@ -18,7 +18,7 @@ export type TagType = {
 
 export type TagListType = NotionType[];
 
-export type CartItemType = "show" | "edit";
+export type CartItemType = "show" | "edit" | "rubbish";
 
 export type UserType = {
   name: string;

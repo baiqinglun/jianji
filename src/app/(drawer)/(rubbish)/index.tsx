@@ -6,15 +6,20 @@ import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { Checkbox } from "react-native-paper";
 import { FontSize, defalutSize, Colors } from "@/constants";
 import { CartItem, MyDialog } from "@/components";
-import notions from "@assetsdata/notions";
+import { useData } from "@/providers/DataProvider";
 
 const Index = () => {
   const navigation = useNavigation();
   const [checked, setChecked] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
+  const { notions, deleteNotion } = useData();
+  const [deleteList, setDeleteList] = useState<string[]>([]);
 
   const deleteSelect = () => {
     toggleIsDelete();
+    for (let i = 0; i < deleteList.length; i++) {
+      deleteNotion(deleteList[i]);
+    }
   };
   const cancelDelete = () => {
     toggleIsDelete();
@@ -22,6 +27,18 @@ const Index = () => {
 
   const toggleIsDelete = () => {
     setIsDelete(!isDelete);
+  };
+
+  const selectAll = () => {
+    if (!checked) {
+      setChecked(!checked);
+      notions.forEach(item => {
+        setDeleteList(prev => [...prev, item.id]);
+      });
+    } else {
+      setChecked(!checked);
+      setDeleteList([]);
+    }
   };
 
   return (
@@ -66,7 +83,7 @@ const Index = () => {
           color={Colors.light.tint}
           status={checked ? "checked" : "unchecked"}
           onPress={() => {
-            setChecked(!checked);
+            selectAll();
           }}
         />
       </View>
@@ -85,7 +102,7 @@ const Index = () => {
 
       {/* 弹窗 */}
       <MyDialog
-        content="是否全部删除"
+        content="是否删除"
         visible={isDelete}
         onConfirmClick={deleteSelect}
         onCancelClick={cancelDelete}
