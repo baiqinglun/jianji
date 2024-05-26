@@ -1,4 +1,13 @@
-import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  Image,
+  FlatList,
+  RefreshControl,
+} from "react-native";
 import React, { useState, useRef } from "react";
 import { Stack } from "expo-router";
 import {
@@ -6,61 +15,26 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { Colors, FontSize, defalutSize, Dimensions } from "@/constants";
-import { Checkbox } from "react-native-paper";
+import { Colors, FontSize, defalutSize, Dimensions, Images } from "@/constants";
 import { useNavigation } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useSqlite } from "@/providers/SqliteProvider";
+import { CartItem } from "@/components";
+import { useData } from "@/providers/DataProvider";
 
 export default function SearchScreen() {
   const insets = useSafeAreaInsets();
   const [searchText, setSearchText] = useState("");
-  const [selectedIndexes, setSelectedIndexes] = useState([]);
-  const [selectTag, setSelectTag] = useState<"checked" | "unchecked">(
-    "unchecked",
-  );
-  const [selectedContent, setSelectedContent] = useState<
-    "checked" | "unchecked"
-  >("checked");
-  const { exeSql } = useSqlite();
   const navigation = useNavigation();
-
-  const getStatus = (status: string) => {
-    switch (status) {
-      case "checked":
-        return true;
-      case "unchecked":
-        return false;
-      default:
-        break;
-    }
-  };
-
-  const toggleSelectTag = () => {
-    if (selectTag === "unchecked") {
-      setSelectTag("checked");
-    } else {
-      setSelectTag("unchecked");
-    }
-  };
-  const toggleSelectedContent = () => {
-    if (selectedContent === "unchecked") {
-      setSelectedContent("checked");
-    } else {
-      setSelectedContent("unchecked");
-    }
-  };
+  const [isLodedData, setIsLodedData] = useState<boolean>(false);
+  const { searchTempNotions, notionsByTemp } = useData();
 
   const textInput: any = useRef(null);
 
   // 搜索
   const search = () => {
-    setSearchText("");
-    exeSql("searchNotionByContent", [`%${searchText}%`]).then(
-      searchNotionByContentRes => {
-        console.log(searchNotionByContentRes);
-      },
-    );
+    searchTempNotions(searchText).then(() => {
+      setIsLodedData(true);
+    });
   };
 
   return (
@@ -102,21 +76,13 @@ export default function SearchScreen() {
           />
         </View>
         <Pressable onPress={search}>
-          <Text style={styles.search}>搜索</Text>
+          <Text style={styles.search}>{"搜索"}</Text>
         </Pressable>
       </View>
 
       {/* 内容 */}
-      <View style={styles.selectContainer}>
+      {/*<View style={styles.selectContainer}>
         <Text style={styles.selectTip}>搜索指定内容</Text>
-        <Checkbox.Item
-          color={Colors.light.tint}
-          label="标签"
-          status={selectTag}
-          onPress={() => {
-            toggleSelectTag();
-          }}
-        />
         <Checkbox.Item
           color={Colors.light.tint}
           label="内容"
@@ -125,6 +91,44 @@ export default function SearchScreen() {
             toggleSelectedContent();
           }}
         />
+      </View>*/}
+      <View style={styles.contentContainer}>
+        {isLodedData ? (
+          <FlatList
+            data={notionsByTemp}
+            renderItem={({ item }) => (
+              <CartItem
+                cartType="show"
+                notion={item}
+                getData={null}
+                onRefresh={null}
+              />
+            )}
+            contentContainerStyle={{
+              gap: defalutSize,
+              padding: defalutSize * 0.5,
+            }}
+            refreshControl={
+              <RefreshControl
+                refreshing={null}
+                onRefresh={null}
+              />
+            }
+          />
+        ) : (
+          <View
+            style={{ flex: 1, flexDirection: "column", alignItems: "center" }}
+          >
+            <Image
+              source={Images.blackPageImage}
+              style={styles.blackPageImage}
+              resizeMode="contain"
+            />
+            <Text style={{ fontSize: FontSize.ll, color: "#999" }}>
+              未查找到
+            </Text>
+          </View>
+        )}
       </View>
     </SafeAreaProvider>
   );
@@ -133,7 +137,7 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f2f2f2",
   },
   top: {
     marginTop: 0,
@@ -144,7 +148,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: "row",
-    backgroundColor: "#f2f4f3",
+    backgroundColor: "#fff",
     alignItems: "center",
     width: Dimensions.windowWidth - 120,
     paddingHorizontal: defalutSize,
@@ -173,5 +177,15 @@ const styles = StyleSheet.create({
     fontSize: FontSize.m,
     marginLeft: defalutSize,
     marginBottom: defalutSize * 2,
+  },
+  contentContainer: {
+    // backgroundColor: "red",
+    width: Dimensions.windowWidth,
+    height: Dimensions.windowHeight,
+  },
+  blackPageImage: {
+    width: "100%",
+    height: 400,
+    opacity: 0.2,
   },
 });

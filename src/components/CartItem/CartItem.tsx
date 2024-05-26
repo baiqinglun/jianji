@@ -42,7 +42,7 @@ const CartItem = ({ notion, cartType, getData, onRefresh }: Props) => {
       <View style={styles.container}>
         <View style={styles.time}>
           <Text style={styles.timeText}>
-            {cartType == "show"
+            {cartType === "show"
               ? dayjs(notion.update_time).format("YYYY-MM-DD HH:mm:ss")
               : dayjs(notion.update_time).fromNow()}
           </Text>
@@ -93,7 +93,7 @@ const CartItem = ({ notion, cartType, getData, onRefresh }: Props) => {
               </View>
             }
           >
-            {cartType == "show" ? (
+            {cartType === "show" ? (
               <MaterialIcons
                 name="more-horiz"
                 color={Colors.light.other}

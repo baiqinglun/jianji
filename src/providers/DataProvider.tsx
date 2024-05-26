@@ -13,11 +13,14 @@ import { useSqlite } from "@/providers/SqliteProvider";
 
 type SqliteType = {
   notions: NotionListType;
+  notionsByTemp: NotionListType;
   tags: TagListType;
   userInformation: UserType;
   contentInformation: ContentInformationProp;
   setNotions: Dispatch<SetStateAction<NotionListType>>;
   getAllNotion: () => Promise<void>;
+  setNotionsByTemp: Dispatch<SetStateAction<NotionListType>>;
+  searchTempNotions: (textInput: string) => Promise<void>;
   addNotion: (textInput: string, tagInput: string) => Promise<void>;
   updateNotion: (textInput: string, id: string) => Promise<void>;
   deleteNotion: (id: string) => Promise<void>;
@@ -32,10 +35,13 @@ type SqliteType = {
 const DataContext = createContext<SqliteType>({
   notions: [],
   tags: [],
+  notionsByTemp: [],
   userInformation: { name: "", password: "", image: "", create_time: 0 },
   contentInformation: { notionCount: 0, tagCount: 0, dayCount: 0 },
   setNotions: () => {},
+  setNotionsByTemp: () => {},
   getAllNotion: async () => {},
+  searchTempNotions: async (textInput: string) => {},
   addNotion: async (textInput: string, tagInput: string) => {},
   updateNotion: async (textInput: string, id: string) => {},
   deleteNotion: async (id: string) => {},
@@ -55,6 +61,7 @@ type ContentInformationProp = {
 
 const DataProvider = ({ children }: PropsWithChildren) => {
   const [notions, setNotions] = useState<NotionListType>([]);
+  const [notionsByTemp, setNotionsByTemp] = useState<NotionListType>([]);
   const [tags, setTags] = useState<TagListType>([]);
   const [userInformation, setUserInformation] = useState<UserType>({
     name: "",
@@ -94,6 +101,30 @@ const DataProvider = ({ children }: PropsWithChildren) => {
     } catch (error) {
       console.error("Error fetching data", error);
     }
+  };
+
+  // 获取临时notion
+  const searchTempNotions = async (textInput: string) => {
+    let rows: any = [];
+
+    await exeSql("searchNotionByLike", [`%${textInput}%`]).then(
+      searchNotionByLikeRes => {
+        rows = searchNotionByLikeRes[0].rows;
+      },
+    );
+
+    // 使用 Promise.all 处理所有异步操作
+    const updatedRows: any = await Promise.all(
+      rows.map(async (row: any) => {
+        const searchTagNameByIdRes = await exeSql("searchTagNameById", [
+          row.tag,
+        ]);
+        row.tag = searchTagNameByIdRes[0].rows[0]?.name;
+        return row;
+      }),
+    );
+
+    setNotionsByTemp(updatedRows);
   };
 
   // 添加notion
@@ -219,8 +250,10 @@ const DataProvider = ({ children }: PropsWithChildren) => {
       value={{
         notions,
         tags,
+        notionsByTemp,
         setNotions,
         getAllNotion,
+        setNotionsByTemp,
         addNotion,
         updateNotion,
         addTag,
@@ -232,6 +265,7 @@ const DataProvider = ({ children }: PropsWithChildren) => {
         getNotionInformation,
         contentInformation,
         userInformation,
+        searchTempNotions,
       }}
     >
       {children}

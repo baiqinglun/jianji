@@ -18,7 +18,7 @@ const UserInformation = () => {
           <View style={styles.user}>
             <Image
               style={styles.avater}
-              source={{ uri: userInformation?.image }}
+              source={{ uri: userInformation.image }}
             />
             <Text style={styles.username}>{userInformation?.name}</Text>
           </View>
